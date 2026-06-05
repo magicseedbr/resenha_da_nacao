@@ -2,7 +2,7 @@ name: Pipeline automático — Resenha da Nação
 
 on:
   schedule:
-    - cron: '0 12 * * *'  # 12h UTC = 9h BRT, todos os dias
+    - cron: '29 18 * * *'  # 18:29 UTC = 15:29 BRT, todos os dias (minuto quebrado evita a fila do :00)
   workflow_dispatch:       # disparo manual pelo painel do GitHub
 
 permissions:
