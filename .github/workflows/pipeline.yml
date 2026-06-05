@@ -65,6 +65,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash origin main
           git add news_extractor/processed_links.json news_extractor/processed_tweets.json || true
+          git add news_extractor/raw_news/ news_extractor/raw_tweets/ || true
+          git add news_curator/used_stories.json news_curator/selected_story.json || true
           git add article_writer/generated_articles/ || true
           git add site_builder/approved.json site_builder/static/covers/ || true
           git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
