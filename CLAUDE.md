@@ -30,15 +30,18 @@ resenha_da_nacao/
 │   │   └── fernanda_aguiar.md          # Cronista direta e provocadora
 │   ├── article_writer_0_1.py           # Seleciona jornalista aleatório e gera artigo
 │   └── generated_articles/             # JSONs dos artigos gerados
-└── site_builder/            # Etapa 5: Publicação — gera o site estático rubro-negro
-    ├── shared.py                       # Utils: slug, editoria por palavra-chave, personas
-    ├── approve.py                      # Gate de aprovação (CLI): revisa e aprova artigos
-    ├── image_searcher_og_0_1.py        # Capa real: extrai og:image da matéria original de cada aprovado
-    ├── build_site.py                   # Gerador estático (Jinja2): home/artigo/editoria/jornalista
-    ├── approved.json                   # Registro dos artigos aprovados (fonte de verdade do site)
-    ├── templates/                      # Templates HTML (base, index, article, editoria, jornalista)
-    ├── static/                         # CSS responsivo rubro-negro, logo.png da marca, escudo, capa-padrão e covers/
-    └── output/                         # Site estático gerado (abrir output/index.html)
+├── site_builder/            # Etapa 5: Publicação — gera o site estático rubro-negro
+│   ├── shared.py                       # Utils: slug, editoria por palavra-chave, personas
+│   ├── approve.py                      # Gate de aprovação (CLI): revisa e aprova artigos
+│   ├── image_searcher_og_0_1.py        # Capa real: extrai og:image da matéria original de cada aprovado
+│   ├── build_site.py                   # Gerador estático (Jinja2): home/artigo/editoria/jornalista
+│   ├── approved.json                   # Registro dos artigos aprovados (fonte de verdade do site)
+│   ├── templates/                      # Templates HTML (base, index, article, editoria, jornalista)
+│   ├── static/                         # CSS responsivo rubro-negro, logo.png da marca, escudo, capa-padrão e covers/
+│   └── output/                         # Site estático gerado (abrir output/index.html)
+└── instagram_creator/       # Etapa 6: Gera posts prontos para o Instagram
+    ├── instagram_post_creator_0_1.py   # Gera legenda (Gemini) + copia capa por artigo aprovado
+    └── instagram_posts/                # Saída: uma pasta por artigo com caption.txt e image.*
 ```
 
 ## Pipeline de Execução
@@ -72,6 +75,12 @@ python image_searcher_og_0_1.py
 
 # 9. Gera o site estático com os artigos aprovados (abre output/index.html)
 python build_site.py
+
+# 10. Gera posts prontos para publicar no Instagram (legenda + imagem por artigo aprovado)
+cd ../instagram_creator && python instagram_post_creator_0_1.py
+
+# 11. Revisa e publica os posts no Instagram via Meta Graph API (etapa manual)
+python instagram_publish_0_1.py
 ```
 
 ## Lógica Principal
