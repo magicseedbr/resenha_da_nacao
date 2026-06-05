@@ -40,5 +40,12 @@
         "editoria": "base",
         "approved_at": "2026-06-04T18:42:27.835255",
         "cover": "static/covers/ferias-no-mengao-onde-o-gigante-descansa-mas-a-nacao-nao-para-de-sonhar.webp"
+    },
+    {
+        "file": "article_20260605_021100.json",
+        "slug": "leila-pereira-tenta-fazer-cao-mas-a-nacao-ja-sacou-fla-e-outro-nivel",
+        "editoria": "mercado",
+        "approved_at": "2026-06-05T02:11:02.825794",
+        "cover": "static/covers/leila-pereira-tenta-fazer-cao-mas-a-nacao-ja-sacou-fla-e-outro-nivel.webp"
     }
 ]
