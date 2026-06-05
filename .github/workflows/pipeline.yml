@@ -67,7 +67,6 @@ jobs:
           git add site_builder/approved.json site_builder/static/covers/ || true
           git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
           git commit -m "Pipeline: novo artigo publicado"
-          git pull --rebase origin main
           git push
 
       - name: Gerar site estático
