@@ -61,5 +61,12 @@
         "editoria": "mercado",
         "approved_at": "2026-06-05T19:29:35.218932",
         "cover": "static/covers/leila-merma-menosprezar-o-fla-e-pedir-pra-levar-paporeto.webp"
+    },
+    {
+        "file": "article_20260605_194211.json",
+        "slug": "leila-pereira-tenta-esquecer-o-fla-mas-a-nacao-bota-a-real",
+        "editoria": "base",
+        "approved_at": "2026-06-05T19:42:13.804446",
+        "cover": "static/covers/leila-pereira-tenta-esquecer-o-fla-mas-a-nacao-bota-a-real.webp"
     }
 ]
