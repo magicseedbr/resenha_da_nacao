@@ -1,0 +1,342 @@
+/* ===========================================================================
+   Resenha da Nação — tema rubro-negro
+   =========================================================================== */
+
+:root {
+  --red: #c0102c;
+  --red-bright: #e30613;
+  --black: #0a0a0a;
+  --ink: #141414;
+  --paper: #f4f4f5;
+  --white: #ffffff;
+  --gray: #6b7280;
+  --gray-light: #e5e7eb;
+  --shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+  --max: 1180px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.6;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+
+/* --- Header ---------------------------------------------------------------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--shadow);
+}
+
+/* Masthead preto (full-bleed): o logo tem fundo transparente e brilha no escuro. */
+.header-top {
+  background: var(--black);
+}
+.header-top-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand { display: inline-flex; align-items: center; position: relative; z-index: 3; }
+/* Logo grande, ancorado à esquerda, transbordando para baixo sobre a faixa
+   da navegação (estilo flamengo.com.br). */
+.brand-logo {
+  height: clamp(112px, 12.5vw, 154px);
+  width: auto;
+  /* Margem inferior bem negativa: o escudo desce, cruza o filete vermelho e
+     "invade" o começo da área branca da página (estilo flamengo.com.br). */
+  margin: 8px 0 -64px;
+  filter: drop-shadow(0 5px 9px rgba(0, 0, 0, 0.45));
+}
+.brand-tagline { color: #b8b8b8; font-size: 0.9rem; font-style: italic; }
+
+/* Barra de navegação preta (full-bleed), com o filete vermelho ao pé do header. */
+.site-nav-bar { background: var(--black); border-bottom: 11px solid var(--red); }
+.site-nav {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 8px;
+  /* Reserva o espaço do escudo saliente para o menu não passar por baixo dele. */
+  padding-left: clamp(124px, 13vw, 164px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.site-nav a {
+  padding: 11px 16px;
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #d6d6d6;
+  border-bottom: 3px solid transparent;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.site-nav a:hover { color: var(--white); background: #1c1c1c; }
+.site-nav a.is-active { color: var(--white); border-bottom-color: var(--red-bright); }
+
+/* --- Layout ---------------------------------------------------------------- */
+
+.site-main { max-width: var(--max); margin: 0 auto; padding: 44px 20px 56px; }
+
+.section-heading {
+  font-family: "Oswald", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: clamp(1.15rem, 0.95rem + 1vw, 1.35rem);
+  margin: 34px 0 18px;
+  border-left: 6px solid var(--red);
+  padding-left: 12px;
+}
+
+/* --- Hero (manchete) ------------------------------------------------------- */
+
+.hero-card {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  background: var(--black);
+  color: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.hero-media { position: relative; }
+.hero-media img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 16/9; }
+.hero-body { padding: 28px; display: flex; flex-direction: column; justify-content: center; }
+.hero-title {
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.05rem + 2.2vw, 2.1rem);
+  line-height: 1.12;
+  margin: 4px 0 12px;
+}
+.hero-subtitle { color: #cfcfcf; font-size: 1.05rem; margin: 0 0 16px; }
+.hero-card:hover .hero-title { color: #ffd9d9; }
+
+/* --- Tags ------------------------------------------------------------------ */
+
+.tag {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.card-media .tag, .hero-media .tag, .post-cover .tag {
+  position: absolute; left: 12px; top: 12px;
+}
+.tag-link:hover { background: var(--red-bright); }
+
+/* --- Card grid (feed) ------------------------------------------------------ */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+  gap: 22px;
+}
+.card {
+  background: var(--white);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform .15s, box-shadow .15s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,.18); }
+.card-media { position: relative; }
+.card-media img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.card-body { padding: 14px 16px 18px; }
+.card-title {
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  font-size: 1.18rem;
+  line-height: 1.2;
+  margin: 2px 0 10px;
+}
+.card:hover .card-title { color: var(--red); }
+
+/* --- Byline ---------------------------------------------------------------- */
+
+.byline { color: var(--gray); font-size: 0.85rem; margin: 0; }
+.byline-author { color: var(--red); font-weight: 600; }
+
+/* --- Article post ---------------------------------------------------------- */
+
+.post { max-width: 760px; margin: 0 auto; }
+.post-head { margin-bottom: 18px; }
+.post-title {
+  font-family: "Oswald", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 1.1rem + 3vw, 2.5rem);
+  line-height: 1.1;
+  margin: 12px 0 10px;
+}
+.post-subtitle { font-size: 1.25rem; color: #333; margin: 0 0 18px; }
+.post-meta {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 14px 0; border-top: 1px solid var(--gray-light);
+  border-bottom: 1px solid var(--gray-light);
+}
+.author-chip { display: flex; align-items: center; gap: 10px; }
+.author-chip:hover strong { color: var(--red); }
+.post-date { color: var(--gray); font-size: 0.9rem; }
+
+.post-cover { margin: 22px 0; position: relative; }
+.post-cover img { width: 100%; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; }
+
+.post-body { font-size: 1.12rem; color: #1f2430; }
+.post-body p { margin: 0 0 1.25em; }
+.post-body p:first-of-type::first-letter {
+  font-family: "Oswald", sans-serif;
+  font-size: 3.4rem;
+  font-weight: 700;
+  color: var(--red);
+  float: left;
+  line-height: 0.8;
+  padding: 6px 10px 0 0;
+}
+
+.post-source {
+  margin: 30px 0 10px;
+  padding: 16px 18px;
+  background: #fff;
+  border-left: 5px solid var(--red);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+.post-source p { margin: 0 0 6px; color: var(--gray); }
+.source-link { color: var(--red); font-weight: 600; }
+.source-link:hover { text-decoration: underline; }
+
+.back-link {
+  display: inline-block; margin-top: 26px;
+  font-family: "Oswald", sans-serif; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--red); font-weight: 600;
+}
+
+/* --- Avatares -------------------------------------------------------------- */
+
+.avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--red); color: var(--white);
+  font-family: "Oswald", sans-serif; font-weight: 700;
+  border-radius: 50%;
+  border: 2px solid var(--black);
+}
+.avatar-sm { width: 34px; height: 34px; font-size: 0.85rem; }
+.avatar-lg { width: 84px; height: 84px; font-size: 2rem; }
+
+/* --- Perfil do jornalista -------------------------------------------------- */
+
+.profile {
+  background: var(--black); color: var(--white);
+  border-radius: 12px; padding: 28px; box-shadow: var(--shadow);
+}
+.profile-head { display: flex; align-items: center; gap: 20px; }
+.profile-name {
+  font-family: "Oswald", sans-serif; font-size: 2rem; margin: 0;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.profile-role { color: var(--red-bright); margin: 4px 0 0; font-weight: 600; }
+.profile-bio { color: #d6d6d6; margin: 18px 0 0; font-size: 1.05rem; }
+
+/* --- Estados vazios -------------------------------------------------------- */
+
+.empty, .empty-note { text-align: center; color: var(--gray); padding: 40px 0; }
+.empty h1 { font-family: "Oswald", sans-serif; color: var(--ink); }
+.empty code, .empty-note code { background: #fff; padding: 2px 6px; border-radius: 4px; }
+
+/* --- Footer ---------------------------------------------------------------- */
+
+.site-footer { background: var(--black); color: #cfcfcf; border-top: 4px solid var(--red); }
+.footer-inner {
+  max-width: var(--max); margin: 0 auto; padding: 28px 20px;
+  display: flex; align-items: center; gap: 22px;
+}
+.footer-logo {
+  height: 78px; width: auto; flex-shrink: 0;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+}
+.footer-note { margin: 0; font-size: 0.85rem; max-width: 720px; }
+
+/* --- Responsivo ------------------------------------------------------------ */
+
+/* Tablet (paisagem) */
+@media (max-width: 980px) {
+  .hero-card { grid-template-columns: 1.1fr 1fr; }
+  .hero-body { padding: 22px; }
+  .site-main { padding: 24px 18px 48px; }
+
+  /* O transbordo grande do logo é só para desktop largo; aqui ele volta a
+     caber no masthead e o menu ocupa a largura cheia. */
+  .brand-logo { height: clamp(70px, 10vw, 90px); margin: 2px 0; }
+  .site-nav { padding-left: 8px; }
+}
+
+/* Tablet (retrato) / mobile largo */
+@media (max-width: 760px) {
+  .brand-tagline { display: none; }
+  .header-top-inner { padding: 8px 16px; }
+
+  /* No mobile o logo não transborda (cobriria o menu rolável). */
+  .brand-logo { height: clamp(56px, 14vw, 72px); margin: 2px 0; }
+
+  /* Navegação vira uma faixa rolável na horizontal, sem quebrar linha. */
+  .site-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-left: 8px;
+  }
+  .site-nav::-webkit-scrollbar { display: none; }
+  .site-nav a { white-space: nowrap; }
+
+  /* Manchete em coluna única (imagem em cima, texto embaixo). */
+  .hero-card { grid-template-columns: 1fr; }
+  .hero-body { padding: 20px; }
+
+  .post-body { font-size: 1.05rem; }
+  .post-source { padding: 14px 16px; }
+  .profile { padding: 22px; }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .site-main { padding: 18px 14px 40px; }
+  .card-grid { gap: 16px; }
+
+  .hero-subtitle { font-size: 1rem; }
+  .post-subtitle { font-size: 1.1rem; }
+  .post-body p:first-of-type::first-letter { font-size: 2.8rem; }
+  .post-meta { gap: 10px 14px; }
+
+  /* Perfil do jornalista empilha o avatar e o nome. */
+  .profile-head { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .avatar-lg { width: 68px; height: 68px; font-size: 1.6rem; }
+  .profile-name { font-size: 1.6rem; }
+
+  /* Rodapé empilhado. */
+  .footer-inner { flex-direction: column; align-items: flex-start; padding: 24px 16px; }
+}

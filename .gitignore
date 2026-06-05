@@ -1,0 +1,15 @@
+# Segredos — nunca commitar
+.env
+
+# Ambiente virtual Python
+venv/
+
+# Caches Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Site gerado (build feito pelo GitHub Actions a partir das fontes)
+site_builder/output/

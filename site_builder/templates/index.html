@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if featured %}
+<section class="hero">
+  <a class="hero-card" href="{{ root }}artigo/{{ featured.slug }}.html">
+    <div class="hero-media">
+      <img src="{{ root }}{{ featured.cover }}" alt="">
+      <span class="tag tag-hero">{{ featured.editoria_label }}</span>
+    </div>
+    <div class="hero-body">
+      <h1 class="hero-title">{{ featured.title }}</h1>
+      {% if featured.subtitle %}<p class="hero-subtitle">{{ featured.subtitle }}</p>{% endif %}
+      <p class="byline">Por <span class="byline-author">{{ featured.author }}</span> · {{ featured.date_display }}</p>
+    </div>
+  </a>
+</section>
+{% endif %}
+
+{% if rest %}
+<section class="feed">
+  <h2 class="section-heading"><span>Últimas da Nação</span></h2>
+  <div class="card-grid">
+    {% for a in rest %}
+    <article class="card">
+      <a href="{{ root }}artigo/{{ a.slug }}.html">
+        <div class="card-media">
+          <img src="{{ root }}{{ a.cover }}" alt="">
+          <span class="tag">{{ a.editoria_label }}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ a.title }}</h3>
+          <p class="byline">Por {{ a.author }} · {{ a.date_display }}</p>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not featured %}
+<section class="empty">
+  <h1>Ainda não há notícias publicadas</h1>
+  <p>Aprove um artigo com <code>python approve.py</code> e gere o site novamente.</p>
+</section>
+{% endif %}
+
+{% endblock %}

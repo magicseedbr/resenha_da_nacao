@@ -1,0 +1,44 @@
+[
+    {
+        "file": "article_20260604_173354.json",
+        "slug": "a-convocacao-que-faz-o-planeta-girar-marcelo-salazar-larga-o-deserto-pelo-manto-sagrado",
+        "editoria": "base",
+        "approved_at": "2026-06-04T18:29:00.585593",
+        "cover": "static/covers/a-convocacao-que-faz-o-planeta-girar-marcelo-salazar-larga-o-deserto-pelo-manto-sagrado.webp"
+    },
+    {
+        "file": "article_20260604_183957.json",
+        "slug": "um-novo-amanhecer-na-gavea-a-nacao-de-olho-no-futuro",
+        "editoria": "base",
+        "approved_at": "2026-06-04T18:42:27.832882",
+        "cover": "static/covers/um-novo-amanhecer-na-gavea-a-nacao-de-olho-no-futuro.webp"
+    },
+    {
+        "file": "article_20260604_184034.json",
+        "slug": "abel-tenta-explicar-mas-o-fla-manda-quando-ate-o-rival-reclama-usando-o-mengao-de-exemplo",
+        "editoria": "geral",
+        "approved_at": "2026-06-04T18:42:27.833681",
+        "cover": "static/covers/abel-tenta-explicar-mas-o-fla-manda-quando-ate-o-rival-reclama-usando-o-mengao-de-exemplo.webp"
+    },
+    {
+        "file": "article_20260604_184109.json",
+        "slug": "a-alma-rubro-negra-no-amarelo-da-selecao-o-orgulho-que-transborda",
+        "editoria": "base",
+        "approved_at": "2026-06-04T18:42:27.834207",
+        "cover": "static/covers/a-alma-rubro-negra-no-amarelo-da-selecao-o-orgulho-que-transborda.webp"
+    },
+    {
+        "file": "article_20260604_184135.json",
+        "slug": "o-ninho-de-ouro-brilha-na-selecao-alisson-que-o-diga",
+        "editoria": "base",
+        "approved_at": "2026-06-04T18:42:27.834775",
+        "cover": "static/covers/o-ninho-de-ouro-brilha-na-selecao-alisson-que-o-diga.webp"
+    },
+    {
+        "file": "article_20260604_184203.json",
+        "slug": "ferias-no-mengao-onde-o-gigante-descansa-mas-a-nacao-nao-para-de-sonhar",
+        "editoria": "base",
+        "approved_at": "2026-06-04T18:42:27.835255",
+        "cover": "static/covers/ferias-no-mengao-onde-o-gigante-descansa-mas-a-nacao-nao-para-de-sonhar.webp"
+    }
+]

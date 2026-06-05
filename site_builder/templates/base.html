@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ site_name }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}Resenha da Nação — notícias do Flamengo com a voz da torcida.{% endblock %}">
+  <meta property="og:site_name" content="{{ site_name }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:image" content="{{ root }}static/logo.png">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ root }}static/style.css">
+  <link rel="icon" type="image/svg+xml" href="{{ root }}static/escudo.svg">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-top">
+      <div class="header-top-inner">
+        <a class="brand" href="{{ root }}index.html" aria-label="Resenha da Nação — início">
+          <img class="brand-logo" src="{{ root }}static/logo.png"
+               alt="Resenha da Nação" width="440" height="240">
+        </a>
+        <span class="brand-tagline">A Nação em primeira mão</span>
+      </div>
+    </div>
+    <div class="site-nav-bar">
+      <nav class="site-nav" aria-label="Editorias">
+        <a href="{{ root }}index.html" class="{{ 'is-active' if active_editoria == 'home' else '' }}">Home</a>
+        {% for ed in editorias %}
+        <a href="{{ root }}editoria/{{ ed.slug }}.html"
+           class="{{ 'is-active' if active_editoria == ed.slug else '' }}">{{ ed.label }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <img class="footer-logo" src="{{ root }}static/logo.png"
+           alt="Resenha da Nação" width="480" height="261">
+      <p class="footer-note">Jornalismo independente sobre o Flamengo, sem vínculo oficial com o clube. Vermelho e preto que corre nas veias.</p>
+    </div>
+  </footer>
+</body>
+</html>

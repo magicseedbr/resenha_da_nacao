@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} — {{ site_name }}{% endblock %}
+{% block description %}{{ article.subtitle or article.title }}{% endblock %}
+{% block content %}
+
+<article class="post">
+  <div class="post-head">
+    <a class="tag tag-link" href="{{ root }}editoria/{{ article.editoria_slug }}.html">{{ article.editoria_label }}</a>
+    <h1 class="post-title">{{ article.title }}</h1>
+    {% if article.subtitle %}<p class="post-subtitle">{{ article.subtitle }}</p>{% endif %}
+    <div class="post-meta">
+      <a class="author-chip" href="{{ root }}jornalista/{{ article.author_slug }}.html">
+        <span class="avatar avatar-sm">{{ article.author_initials }}</span>
+        <span>Por <strong>{{ article.author }}</strong></span>
+      </a>
+      <span class="post-date">{{ article.date_display }}</span>
+    </div>
+  </div>
+
+  <figure class="post-cover">
+    <img src="{{ root }}{{ article.cover }}" alt="">
+  </figure>
+
+  <div class="post-body">
+    {% for p in article.paragraphs %}<p>{{ p }}</p>{% endfor %}
+  </div>
+
+  <a class="back-link" href="{{ root }}index.html">← Voltar para a Home</a>
+</article>
+
+{% endblock %}

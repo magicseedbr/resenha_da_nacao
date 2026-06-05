@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ editoria_label }} — {{ site_name }}{% endblock %}
+{% block content %}
+
+<section class="feed">
+  <h2 class="section-heading"><span>{{ editoria_label }}</span></h2>
+
+  {% if articles %}
+  <div class="card-grid">
+    {% for a in articles %}
+    <article class="card">
+      <a href="{{ root }}artigo/{{ a.slug }}.html">
+        <div class="card-media">
+          <img src="{{ root }}{{ a.cover }}" alt="">
+          <span class="tag">{{ a.editoria_label }}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ a.title }}</h3>
+          <p class="byline">Por {{ a.author }} · {{ a.date_display }}</p>
+        </div>
+      </a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-note">Nenhuma notícia nesta editoria por enquanto.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

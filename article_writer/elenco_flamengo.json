@@ -1,0 +1,59 @@
+{
+  "data_atualizacao": "2026-06-04",
+  "tecnico": "Leonardo Jardim",
+  "jogadores_principais": [
+    "Pedro (atacante)",
+    "Luiz Araujo (atacante)",
+    "Everton (atacante)",
+    "Giorgian De Arrascaeta (meia)",
+    "Lucas Paquetá (meia)",
+    "Enzo Pulgar (meia)",
+    "Gabriel Varela (lateral-direito)",
+    "Léo Pereira (zagueiro)",
+    "Leo Ortiz (zagueiro)",
+    "Alex Sandro (lateral-esquerdo)",
+    "Danilo (zagueiro)",
+    "Emerson Royal (lateral-direito)",
+    "Rossi (goleiro)"
+  ],
+  "transferencias_recentes": [
+    {
+      "nome": "Lucas Paquetá",
+      "tipo": "entrada",
+      "de_para": "West Ham",
+      "data": "2026-01",
+      "nota": "Maior contratação do futebol brasileiro (R$ 260 mi)"
+    },
+    {
+      "nome": "Vitão",
+      "tipo": "entrada",
+      "de_para": "Internacional",
+      "data": "2026-01"
+    },
+    {
+      "nome": "Andrew",
+      "tipo": "entrada",
+      "de_para": "Gil Vicente",
+      "data": "2026-01"
+    },
+    {
+      "nome": "Michael",
+      "tipo": "saida",
+      "de_para": "Al Ula",
+      "data": "2026-02-01"
+    },
+    {
+      "nome": "Allan",
+      "tipo": "saida",
+      "de_para": "Corinthians",
+      "data": "2026-02-06"
+    }
+  ],
+  "campeonatos": [
+    "Campeonato Brasileiro (7V-2E-2D)",
+    "Copa Libertadores (2V-0E-0D)",
+    "Copa do Brasil (1V-0E-0D)",
+    "Campeonato Carioca (campeão)"
+  ],
+  "observacoes": "Leonardo Jardim assumiu em março de 2026. 4 jogadores convocados para Copa do Mundo 2026. Candidato natural ao título do Brasileirão. O Flamengo disputa Campeonato Brasileiro, Copa Libertadores e Copa do Brasil."
+}
