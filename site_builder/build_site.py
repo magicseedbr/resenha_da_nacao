@@ -111,6 +111,10 @@ def main():
 
     reset_output()
 
+    # CNAME para domínio customizado no GitHub Pages
+    with open(os.path.join(shared.OUTPUT_DIR, "CNAME"), "w", encoding="utf-8") as f:
+        f.write("resenhadanacao.com.br")
+
     # --- Home ---------------------------------------------------------------
     home_tpl = env.get_template("index.html")
     write_page("index.html", home_tpl.render(

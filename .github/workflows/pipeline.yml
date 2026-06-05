@@ -1,0 +1,85 @@
+name: Pipeline automático — Resenha da Nação
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 12h UTC = 9h BRT, todos os dias
+  workflow_dispatch:       # disparo manual pelo painel do GitHub
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependências
+        run: pip install feedparser requests beautifulsoup4 urllib3 google-generativeai ddgs jinja2
+
+      - name: Criar .env com a chave Gemini
+        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+
+      - name: Extrair notícias (Coluna do Fla + Globo Esporte)
+        run: |
+          cd news_extractor
+          python news_extractor_0_3.py
+          python news_extractor_globo_0_3.py
+
+      - name: Coletar tweets
+        run: cd news_extractor && python news_extractor_x_0_1.py
+
+      - name: Selecionar melhor notícia (Gemini)
+        run: cd news_curator && python news_extractor_curator_0_1.py
+
+      - name: Gerar artigo original (Gemini)
+        run: cd article_writer && python article_writer_0_1.py
+
+      - name: Aprovar artigo automaticamente
+        run: cd site_builder && python auto_approve.py
+
+      - name: Buscar capa real (og:image)
+        run: cd site_builder && python image_searcher_og_0_1.py
+
+      - name: Persistir arquivos gerados no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news_extractor/processed_links.json news_extractor/processed_tweets.json || true
+          git add article_writer/generated_articles/ || true
+          git add site_builder/approved.json site_builder/static/covers/ || true
+          git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
+          git commit -m "Pipeline: novo artigo publicado"
+          git push
+
+      - name: Gerar site estático
+        working-directory: site_builder
+        run: python build_site.py
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefato do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site_builder/output
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
