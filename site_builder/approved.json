@@ -54,5 +54,12 @@
         "editoria": "base",
         "approved_at": "2026-06-05T14:39:10.722647",
         "cover": "static/covers/leila-e-o-mengao-nao-somos-rivais-mas-na-hora-da-grana-o-papo-muda-ne.webp"
+    },
+    {
+        "file": "article_20260605_192933.json",
+        "slug": "leila-merma-menosprezar-o-fla-e-pedir-pra-levar-paporeto",
+        "editoria": "mercado",
+        "approved_at": "2026-06-05T19:29:35.218932",
+        "cover": "static/covers/leila-merma-menosprezar-o-fla-e-pedir-pra-levar-paporeto.webp"
     }
 ]
