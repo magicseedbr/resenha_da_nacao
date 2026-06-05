@@ -47,5 +47,12 @@
         "editoria": "mercado",
         "approved_at": "2026-06-05T02:11:02.825794",
         "cover": "static/covers/leila-pereira-tenta-fazer-cao-mas-a-nacao-ja-sacou-fla-e-outro-nivel.webp"
+    },
+    {
+        "file": "article_20260605_143908.json",
+        "slug": "leila-e-o-mengao-nao-somos-rivais-mas-na-hora-da-grana-o-papo-muda-ne",
+        "editoria": "base",
+        "approved_at": "2026-06-05T14:39:10.722647",
+        "cover": "static/covers/leila-e-o-mengao-nao-somos-rivais-mas-na-hora-da-grana-o-papo-muda-ne.webp"
     }
 ]
