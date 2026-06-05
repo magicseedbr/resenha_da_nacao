@@ -68,5 +68,12 @@
         "editoria": "base",
         "approved_at": "2026-06-05T19:42:13.804446",
         "cover": "static/covers/leila-pereira-tenta-esquecer-o-fla-mas-a-nacao-bota-a-real.webp"
+    },
+    {
+        "file": "article_20260605_224607.json",
+        "slug": "mercado-rubro-negro-artilheiro-argentino-no-radar-e-rivais-na-cola-ah-mermao",
+        "editoria": "base",
+        "approved_at": "2026-06-05T22:46:09.540372",
+        "cover": "static/covers/mercado-rubro-negro-artilheiro-argentino-no-radar-e-rivais-na-cola-ah-mermao.webp"
     }
 ]
