@@ -75,5 +75,12 @@
         "editoria": "base",
         "approved_at": "2026-06-05T22:46:09.540372",
         "cover": "static/covers/mercado-rubro-negro-artilheiro-argentino-no-radar-e-rivais-na-cola-ah-mermao.webp"
+    },
+    {
+        "file": "article_20260606_093116.json",
+        "slug": "o-manto-sagrado-e-a-voz-do-gigante-o-legado-rubro-negro-que-guia-a-nacao",
+        "editoria": "base",
+        "approved_at": "2026-06-06T09:31:18.480660",
+        "cover": "static/covers/o-manto-sagrado-e-a-voz-do-gigante-o-legado-rubro-negro-que-guia-a-nacao.webp"
     }
 ]
