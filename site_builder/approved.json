@@ -89,5 +89,12 @@
         "editoria": "base",
         "approved_at": "2026-06-07T10:12:43.716543",
         "cover": "static/covers/ninho-em-modo-reboot-salazar-chega-pra-ligacao-direta-na-base.webp"
+    },
+    {
+        "file": "article_20260607_165901.json",
+        "slug": "selecao-balanca-mas-o-fla-ta-sempre-la",
+        "editoria": "base",
+        "approved_at": "2026-06-07T16:59:03.394990",
+        "cover": "static/covers/selecao-balanca-mas-o-fla-ta-sempre-la.webp"
     }
 ]
