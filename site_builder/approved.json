@@ -96,5 +96,12 @@
         "editoria": "base",
         "approved_at": "2026-06-07T16:59:03.394990",
         "cover": "static/covers/selecao-balanca-mas-o-fla-ta-sempre-la.webp"
+    },
+    {
+        "file": "article_20260607_221923.json",
+        "slug": "corte-na-selecao-e-mo-parada-mas-a-gavea-forja-diferente",
+        "editoria": "base",
+        "approved_at": "2026-06-07T22:19:25.340793",
+        "cover": "static/covers/corte-na-selecao-e-mo-parada-mas-a-gavea-forja-diferente.webp"
     }
 ]
