@@ -103,5 +103,12 @@
         "editoria": "base",
         "approved_at": "2026-06-07T22:19:25.340793",
         "cover": "static/covers/corte-na-selecao-e-mo-parada-mas-a-gavea-forja-diferente.webp"
+    },
+    {
+        "file": "article_20260608_143359.json",
+        "slug": "danilo-titular-na-copa-o-plot-twist-que-so-o-mengao-consegue-entregar",
+        "editoria": "base",
+        "approved_at": "2026-06-08T14:34:01.371300",
+        "cover": "static/covers/danilo-titular-na-copa-o-plot-twist-que-so-o-mengao-consegue-entregar.webp"
     }
 ]
