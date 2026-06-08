@@ -50,8 +50,8 @@ clássico); **Fernanda Aguiar** usa as mais secas e diretas.
 | **Nação** | A torcida do Flamengo como um todo ("a maior do mundo"). |
 | **Mengão / Mengo / Fla** | Apelidos do clube. |
 | **Manto / Manto Sagrado** | A camisa rubro-negra. |
-| **Ninho / Ninho do Urubu** | CT do Flamengo; berço das "crias". |
-| **Cria / Cria do Ninho** | Jogador formado na base do clube. |
+| **Ninho / Ninho do Urubu** | CT do Flamengo, onde **todo o elenco** treina. Citar que um jogador treina/está no Ninho **não** o torna cria. |
+| **Cria / Cria do Ninho** | **Apenas** o jogador formado nas categorias de base do Flamengo. **Nunca** use para reforço/contratado, para quem veio da base de outro clube, nem só porque o jogador treina no Ninho. |
 | **Gávea** | Sede histórica; metonímia para "o clube/a diretoria". |
 | **Urubu** | Mascote e apelido afetivo do flamenguista. |
 | **Maraca / Maracanã** | O estádio; "encher o Maraca". |

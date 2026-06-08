@@ -40,7 +40,17 @@ EDITORIAS = {
 # Slug da editoria -> lista de termos (já sem acento, minúsculos). A primeira
 # editoria com ao menos um termo presente vence; "geral" é o fallback.
 _EDITORIA_KEYWORDS = {
-    "base": ["sub-20", "sub20", "sub-17", "sub17", " base", "cria", "gavea", "ninho"],
+    # Só contexto REAL de base. "ninho"/"gavea"/" base"/"cria" soltos eram
+    # gatilhos errados: o Ninho do Urubu é o CT de TODO o elenco, e a Gávea é
+    # a sede/diretoria. "Crias do Ninho" = matéria sobre a base, não o CT.
+    "base": [
+        "sub-20", "sub20", "sub-17", "sub17", "sub-15", "sub15",
+        "cria do ninho", "crias do ninho", "moleque do ninho",
+        "molecada do ninho", "garoto do ninho", "garotos do ninho",
+        "joia da base", "categoria de base", "categorias de base",
+        "revelado pel", "formado na base", "formado nas categorias",
+        "base rubro-negra",
+    ],
     "selecao": ["selecao", "copa do mundo", "ancelotti", "convoca"],
     "mercado": [
         "contrat", "transfer", "reforco", "negocia", "proposta",

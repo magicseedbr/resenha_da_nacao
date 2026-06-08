@@ -28,6 +28,9 @@ resenha_da_nacao/
 │   │   ├── rodrigo_marques.md          # Cronista veterano e dramático
 │   │   ├── thiago_vasconcelos.md       # Analista descolado da nova geração
 │   │   └── fernanda_aguiar.md          # Cronista direta e provocadora
+│   ├── elenco_flamengo.json            # Elenco atual + crias_da_base (mantido por update_crias.py)
+│   ├── glossario_carioca.md            # Guia de sotaque/vocabulário rubro-negro
+│   ├── update_crias.py                 # Detecta via Gemini quem é cria da base e atualiza crias_da_base
 │   ├── article_writer_0_1.py           # Seleciona jornalista aleatório e gera artigo
 │   └── generated_articles/             # JSONs dos artigos gerados
 ├── site_builder/            # Etapa 5: Publicação — gera o site estático rubro-negro
@@ -64,8 +67,11 @@ cd ../news_curator && python news_extractor_curator_0_1.py
 # 5. Busca imagem relevante para o artigo vencedor
 cd ../image_searcher && python image_searcher_0_1.py
 
-# 6. Gera artigo original por um dos 3 jornalistas fictícios
-cd ../article_writer && python article_writer_0_1.py
+# 6. Atualiza a lista de crias da base (Gemini; só chama a API se o elenco mudou)
+cd ../article_writer && python update_crias.py
+
+# 6b. Gera artigo original por um dos 3 jornalistas fictícios
+python article_writer_0_1.py
 
 # 7. Revisa e aprova artigos para publicação (etapa manual)
 cd ../site_builder && python approve.py
@@ -90,6 +96,11 @@ Mede relevância social cruzando palavras-chave do título da notícia com o cor
 
 ### Curadoria com Gemini
 Os 3 artigos com maior Hype Score são enviados ao Gemini 2.5 Flash como candidatos. O modelo escolhe o mais adequado para um artigo longo considerando valor jornalístico + engajamento social.
+
+### Ninho do Urubu vs. Cria do Ninho (regra importante)
+**"Ninho do Urubu"** é o CT onde **todo o elenco** treina — citar o Ninho não diz nada sobre a origem do jogador. **"Cria do Ninho"** (e variantes: "cria da base", "moleque/garoto do ninho", "joia da base", "revelado pelo Flamengo") vale **apenas** para jogadores formados nas categorias de base do Flamengo. Por isso:
+- `article_writer/update_crias.py` consulta o Gemini para descobrir quais jogadores do elenco são crias e grava em `crias_da_base` (no `elenco_flamengo.json`), com cache por hash do elenco para não chamar a API à toa. O prompt de geração só autoriza o termo para nomes dessa lista.
+- A editoria "Crias do Ninho" (`site_builder/shared.py`) só é atribuída por frases reais de base (`sub-20`, `cria do ninho`, `categoria de base`, `joia da base`, etc.) — não mais por mencionar o CT ("ninho"/"gávea"/"base" soltos foram removidos).
 
 ### Publicação (site_builder)
 Site estático, sem servidor nem banco. `approve.py` é um gate manual: lista os artigos de `generated_articles/` ainda não publicados, mostra prévia e registra os aprovados em `approved.json` (com slug e editoria derivada por palavras-chave do título/corpo). `build_site.py` lê `approved.json` e renderiza com Jinja2 a home (manchete + grade de cards estilo ge.globo), as páginas de artigo, as editorias (Mercado da Bola, Crias do Ninho, Seleção, Bastidores, Geral) e a página de cada jornalista (bio extraída da persona). Tema rubro-negro inspirado em flamengo.com.br, com a marca `static/logo.png` (PNG transparente) sobre o cabeçalho preto + barra de navegação, e layout responsivo (desktop, tablet e mobile via `clamp()` e media queries). A capa de cada artigo é a imagem real obtida por `image_searcher_og_0_1.py` (campo `cover` no `approved.json`); artigos sem capa caem em `static/capa_padrao.svg`.

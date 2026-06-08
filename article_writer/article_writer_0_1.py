@@ -109,11 +109,16 @@ def generate_article(story_data, persona, glossary="", elenco=None):
     if elenco:
         tecnico = elenco.get("tecnico", "Leonardo Jardim")
         jogadores_str = "\n".join(f"- {j}" for j in elenco.get("jogadores_principais", []))
+        crias = elenco.get("crias_da_base", [])
+        crias_str = "\n".join(f"- {c}" for c in crias) if crias else "- (nenhuma cria confirmada no elenco atual)"
         elenco_block = f"""
 --- ELENCO DO FLAMENGO ATUALIZADO ---
 Técnico: {tecnico}
 Principais jogadores:
 {jogadores_str}
+
+CRIAS DA BASE (jogadores formados nas categorias de base do Flamengo):
+{crias_str}
 --- FIM DO ELENCO ---
 """
 
@@ -136,6 +141,9 @@ REGRAS:
 - Respeite a parcimônia indicada por persona (Thiago usa mais gíria; Rodrigo, pouca; Fernanda, as mais secas)
 - **IMPORTANTE:** Sempre use o técnico ATUAL do elenco acima (Leonardo Jardim) — NUNCA mencione Tite ou técnicos antigos
 - **IMPORTANTE:** Ao mencionar jogadores, use APENAS os nomes do elenco listado acima — não invente nomes nem mencione jogadores que saíram
+- **IMPORTANTE (Ninho do Urubu):** "Ninho" / "Ninho do Urubu" é o CT onde TODO o elenco treina. Dizer que um jogador "treina/está no Ninho" NÃO o torna cria da base.
+- **IMPORTANTE (Cria do Ninho):** Só chame um jogador de "cria do ninho", "cria da base", "moleque do ninho", "garoto do ninho", "joia da base" ou "revelado pelo Flamengo" se o nome dele estiver na lista CRIAS DA BASE acima. Para QUALQUER outro jogador, é PROIBIDO usar esses termos.
+- **IMPORTANTE:** Na dúvida sobre a origem de um jogador, NÃO afirme que ele veio da base do Flamengo.
 - Pode ser irreverente, apaixonado, provocador — mas nunca chulo
 - Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON
 

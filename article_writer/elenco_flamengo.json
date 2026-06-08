@@ -1,6 +1,9 @@
 {
   "data_atualizacao": "2026-06-04",
   "tecnico": "Leonardo Jardim",
+  "crias_da_base": [
+    "Lucas Paquetá"
+  ],
   "jogadores_principais": [
     "Pedro (atacante)",
     "Luiz Araujo (atacante)",
@@ -55,5 +58,7 @@
     "Copa do Brasil (1V-0E-0D)",
     "Campeonato Carioca (campeão)"
   ],
-  "observacoes": "Leonardo Jardim assumiu em março de 2026. 4 jogadores convocados para Copa do Mundo 2026. Candidato natural ao título do Brasileirão. O Flamengo disputa Campeonato Brasileiro, Copa Libertadores e Copa do Brasil."
+  "observacoes": "Leonardo Jardim assumiu em março de 2026. 4 jogadores convocados para Copa do Mundo 2026. Candidato natural ao título do Brasileirão. O Flamengo disputa Campeonato Brasileiro, Copa Libertadores e Copa do Brasil.",
+  "crias_hash": "b9a672fc7387fed60fc3adf59db52d355c4f0148d4f4f23e8307d67a7afb3fcf",
+  "crias_atualizadas_em": "2026-06-08T16:11:48.828619"
 }

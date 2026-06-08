@@ -50,6 +50,9 @@ jobs:
       - name: Selecionar melhor notícia (Gemini)
         run: cd news_curator && python news_extractor_curator_0_1.py
 
+      - name: Atualizar lista de crias da base (Gemini, só se elenco mudou)
+        run: cd article_writer && python update_crias.py
+
       - name: Gerar artigo original (Gemini)
         run: cd article_writer && python article_writer_0_1.py
 
@@ -67,6 +70,7 @@ jobs:
           git add news_extractor/processed_links.json news_extractor/processed_tweets.json || true
           git add news_extractor/raw_news/ news_extractor/raw_tweets/ || true
           git add news_curator/used_stories.json news_curator/selected_story.json || true
+          git add article_writer/elenco_flamengo.json || true
           git add article_writer/generated_articles/ || true
           git add site_builder/approved.json site_builder/static/covers/ || true
           git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
