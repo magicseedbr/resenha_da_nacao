@@ -110,5 +110,12 @@
         "editoria": "base",
         "approved_at": "2026-06-08T14:34:01.371300",
         "cover": "static/covers/danilo-titular-na-copa-o-plot-twist-que-so-o-mengao-consegue-entregar.webp"
+    },
+    {
+        "file": "article_20260608_221602.json",
+        "slug": "filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro",
+        "editoria": "bastidores",
+        "approved_at": "2026-06-08T22:16:05.089867",
+        "cover": "static/covers/filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro.jpg"
     }
 ]
