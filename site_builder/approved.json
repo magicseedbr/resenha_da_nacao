@@ -117,5 +117,12 @@
         "editoria": "bastidores",
         "approved_at": "2026-06-08T22:16:05.089867",
         "cover": "static/covers/filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro.jpg"
+    },
+    {
+        "file": "article_20260609_104907.json",
+        "slug": "do-manto-sagrado-a-amarelinha-um-filho-da-nacao-a-servico-do-brasil",
+        "editoria": "selecao",
+        "approved_at": "2026-06-09T10:49:09.578483",
+        "cover": "static/covers/do-manto-sagrado-a-amarelinha-um-filho-da-nacao-a-servico-do-brasil.webp"
     }
 ]
