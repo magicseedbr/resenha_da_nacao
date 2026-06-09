@@ -124,5 +124,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-09T10:49:09.578483",
         "cover": "static/covers/do-manto-sagrado-a-amarelinha-um-filho-da-nacao-a-servico-do-brasil.webp"
+    },
+    {
+        "file": "article_20260609_195156.json",
+        "slug": "o-manto-sagrado-no-mundo-nossos-guerreiros-voando-alto-mas-a-nacao-segura-o-folego",
+        "editoria": "base",
+        "approved_at": "2026-06-09T19:51:58.862710",
+        "cover": "static/covers/o-manto-sagrado-no-mundo-nossos-guerreiros-voando-alto-mas-a-nacao-segura-o-folego.jpg"
     }
 ]
