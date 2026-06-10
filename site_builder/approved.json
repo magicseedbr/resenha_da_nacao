@@ -138,5 +138,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-10T11:07:47.866081",
         "cover": "static/covers/luiz-henrique-e-a-mentalizacao-monstra-vem-pro-mengao-meu-parceiro.webp"
+    },
+    {
+        "file": "article_20260610_212853.json",
+        "slug": "o-flamengo-nao-sonha-pequeno-rumo-ao-trono-do-mundo-nacao",
+        "editoria": "mercado",
+        "approved_at": "2026-06-10T21:28:55.631826",
+        "cover": "static/covers/o-flamengo-nao-sonha-pequeno-rumo-ao-trono-do-mundo-nacao.webp"
     }
 ]
