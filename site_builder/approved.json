@@ -152,5 +152,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-11T12:56:08.391150",
         "cover": "static/covers/o-pedaco-de-sonho-que-aticou-a-nacao-e-a-duvida-que-paira-no-ar.webp"
+    },
+    {
+        "file": "article_20260612_193455.json",
+        "slug": "o-grito-do-maraca-ecoa-elias-o-heroi-de-2013-voltou-para-a-nacao",
+        "editoria": "selecao",
+        "approved_at": "2026-06-12T19:34:57.674802",
+        "cover": "static/covers/o-grito-do-maraca-ecoa-elias-o-heroi-de-2013-voltou-para-a-nacao.webp"
     }
 ]
