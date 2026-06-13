@@ -173,5 +173,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-13T17:05:15.113551",
         "cover": "static/covers/flamengo-faz-historia-e-cala-os-rivais-titulares-na-selecao-e-papo-reto.jpg"
+    },
+    {
+        "file": "article_20260613_222053.json",
+        "slug": "mengao-sempre-no-topo-a-nacao-e-o-peso-da-camisa",
+        "editoria": "base",
+        "approved_at": "2026-06-13T22:20:55.615150",
+        "cover": "static/covers/mengao-sempre-no-topo-a-nacao-e-o-peso-da-camisa.webp"
     }
 ]
