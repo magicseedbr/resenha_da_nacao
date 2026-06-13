@@ -159,5 +159,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-12T19:34:57.674802",
         "cover": "static/covers/o-grito-do-maraca-ecoa-elias-o-heroi-de-2013-voltou-para-a-nacao.webp"
+    },
+    {
+        "file": "article_20260613_083712.json",
+        "slug": "a-nacao-veste-a-amarelinha-nossos-filhos-conquistando-o-mundo",
+        "editoria": "base",
+        "approved_at": "2026-06-13T08:37:14.627999",
+        "cover": "static/covers/a-nacao-veste-a-amarelinha-nossos-filhos-conquistando-o-mundo.webp"
     }
 ]
