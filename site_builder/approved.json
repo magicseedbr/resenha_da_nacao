@@ -166,5 +166,12 @@
         "editoria": "base",
         "approved_at": "2026-06-13T08:37:14.627999",
         "cover": "static/covers/a-nacao-veste-a-amarelinha-nossos-filhos-conquistando-o-mundo.webp"
+    },
+    {
+        "file": "article_20260613_170513.json",
+        "slug": "flamengo-faz-historia-e-cala-os-rivais-titulares-na-selecao-e-papo-reto",
+        "editoria": "selecao",
+        "approved_at": "2026-06-13T17:05:15.113551",
+        "cover": "static/covers/flamengo-faz-historia-e-cala-os-rivais-titulares-na-selecao-e-papo-reto.jpg"
     }
 ]
