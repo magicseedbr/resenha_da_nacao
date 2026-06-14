@@ -180,5 +180,12 @@
         "editoria": "base",
         "approved_at": "2026-06-13T22:20:55.615150",
         "cover": "static/covers/mengao-sempre-no-topo-a-nacao-e-o-peso-da-camisa.webp"
+    },
+    {
+        "file": "article_20260614_103843.json",
+        "slug": "tres-vezes-mengao-na-copa-o-pressagio-rubro-negro-que-arrepia-a-nacao",
+        "editoria": "base",
+        "approved_at": "2026-06-14T10:38:45.765272",
+        "cover": "static/covers/tres-vezes-mengao-na-copa-o-pressagio-rubro-negro-que-arrepia-a-nacao.webp"
     }
 ]
