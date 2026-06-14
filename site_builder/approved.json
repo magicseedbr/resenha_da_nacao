@@ -194,5 +194,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-14T17:04:38.339002",
         "cover": "static/covers/danilo-da-o-papo-na-selecao-isso-e-mentalidade-de-flamengo.webp"
+    },
+    {
+        "file": "article_20260614_224643.json",
+        "slug": "e-hexa-ou-nada-paqueta-deita-na-selecao-e-o-fla-manda-o-papo-reto-na-copa-do-mundo",
+        "editoria": "base",
+        "approved_at": "2026-06-14T22:46:46.025836",
+        "cover": "static/covers/e-hexa-ou-nada-paqueta-deita-na-selecao-e-o-fla-manda-o-papo-reto-na-copa-do-mundo.webp"
     }
 ]
