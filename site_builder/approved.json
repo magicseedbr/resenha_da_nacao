@@ -187,5 +187,12 @@
         "editoria": "base",
         "approved_at": "2026-06-14T10:38:45.765272",
         "cover": "static/covers/tres-vezes-mengao-na-copa-o-pressagio-rubro-negro-que-arrepia-a-nacao.webp"
+    },
+    {
+        "file": "article_20260614_170436.json",
+        "slug": "danilo-da-o-papo-na-selecao-isso-e-mentalidade-de-flamengo",
+        "editoria": "selecao",
+        "approved_at": "2026-06-14T17:04:38.339002",
+        "cover": "static/covers/danilo-da-o-papo-na-selecao-isso-e-mentalidade-de-flamengo.webp"
     }
 ]
