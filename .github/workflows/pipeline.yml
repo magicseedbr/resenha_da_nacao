@@ -100,14 +100,17 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Instalar Chromium para Playwright
+        timeout-minutes: 5
         run: playwright install chromium --with-deps
 
       - name: Postar no X (Twitter)
+        timeout-minutes: 5
         env:
           X_SESSION_JSON: ${{ secrets.X_SESSION_JSON }}
         run: python x_creator/x_ci_publisher_0_1.py
 
       - name: Salvar registro de posts publicados no X
+        timeout-minutes: 2
         run: |
           git add x_creator/x_posts/published_x_posted.json || true
           git diff --cached --quiet && exit 0

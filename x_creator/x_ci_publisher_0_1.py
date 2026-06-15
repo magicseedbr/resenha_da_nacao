@@ -118,6 +118,8 @@ def make_context(browser, session_path=None):
         locale="pt-BR",
         timezone_id="America/Sao_Paulo",
         viewport={"width": 1280, "height": 800},
+        default_navigation_timeout=30_000,
+        default_timeout=15_000,
     )
     if session_path:
         kwargs["storage_state"] = session_path
