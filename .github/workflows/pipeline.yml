@@ -65,6 +65,9 @@ jobs:
       - name: Buscar capa real (og:image)
         run: cd site_builder && python image_searcher_og_0_1.py
 
+      - name: Gerar posts para o X
+        run: python x_creator/x_post_creator_0_1.py
+
       - name: Persistir arquivos gerados no repositório
         run: |
           git config user.name "github-actions[bot]"
@@ -76,6 +79,7 @@ jobs:
           git add article_writer/elenco_flamengo.json || true
           git add article_writer/generated_articles/ || true
           git add site_builder/approved.json site_builder/static/covers/ || true
+          git add x_creator/x_posts/ || true
           git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
           git commit -m "Pipeline: novo artigo publicado"
           git push
@@ -103,3 +107,10 @@ jobs:
         env:
           X_SESSION_JSON: ${{ secrets.X_SESSION_JSON }}
         run: python x_creator/x_ci_publisher_0_1.py
+
+      - name: Salvar registro de posts publicados no X
+        run: |
+          git add x_creator/x_posts/published_x_posted.json || true
+          git diff --cached --quiet && exit 0
+          git commit -m "X: registra posts publicados"
+          git push
