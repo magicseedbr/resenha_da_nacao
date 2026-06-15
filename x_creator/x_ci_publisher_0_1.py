@@ -118,12 +118,13 @@ def make_context(browser, session_path=None):
         locale="pt-BR",
         timezone_id="America/Sao_Paulo",
         viewport={"width": 1280, "height": 800},
-        default_navigation_timeout=30_000,
-        default_timeout=15_000,
     )
     if session_path:
         kwargs["storage_state"] = session_path
-    return browser.new_context(**kwargs)
+    context = browser.new_context(**kwargs)
+    context.set_default_navigation_timeout(30_000)
+    context.set_default_timeout(15_000)
+    return context
 
 
 def new_page(context):
