@@ -3,7 +3,7 @@ import re
 import json
 import glob
 from datetime import datetime
-import google.generativeai as genai
+from google import genai
 
 # Dynamic Path Resolution based on the script's absolute location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -105,10 +105,8 @@ def select_best_story_via_gemini(top_stories):
     if not GEMINI_API_KEY:
         raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY no arquivo .env da raiz do projeto.")
 
-    # Configure official secure google generative AI SDK package handshake
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-    
+    client = genai.Client(api_key=GEMINI_API_KEY)
+
     # Formulate context payload for evaluation loop
     candidates_context = []
     for index, item in enumerate(top_stories):
@@ -137,10 +135,10 @@ def select_best_story_via_gemini(top_stories):
     """
     
     try:
-        # Enforce application/json schema specification matching inside the generation configuration parameter
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"}
+        response = client.models.generate_content(
+            model=GEMINI_MODEL_NAME,
+            contents=prompt,
+            config={"response_mime_type": "application/json"},
         )
         
         decision_data = json.loads(response.text)

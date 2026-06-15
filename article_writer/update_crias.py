@@ -17,7 +17,7 @@ import re
 import json
 import hashlib
 from datetime import datetime
-import google.generativeai as genai
+from google import genai
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ELENCO_FILE = os.path.join(SCRIPT_DIR, "elenco_flamengo.json")
@@ -69,8 +69,7 @@ def detect_crias(names):
     if not GEMINI_API_KEY:
         raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY no arquivo .env da raiz do projeto.")
 
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+    client = genai.Client(api_key=GEMINI_API_KEY)
 
     jogadores_str = "\n".join(f"- {n}" for n in names)
     prompt = f"""Você é um especialista na história do Clube de Regatas do Flamengo.
@@ -95,9 +94,10 @@ Responda SOMENTE com JSON válido, sem markdown:
 }}
 """
     try:
-        response = model.generate_content(
-            prompt,
-            generation_config={"response_mime_type": "application/json"},
+        response = client.models.generate_content(
+            model=GEMINI_MODEL_NAME,
+            contents=prompt,
+            config={"response_mime_type": "application/json"},
         )
         data = json.loads(response.text)
         crias = data.get("crias_da_base", [])

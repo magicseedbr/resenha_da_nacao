@@ -33,10 +33,13 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar dependências
-        run: pip install feedparser requests beautifulsoup4 urllib3 google-generativeai ddgs jinja2
+        run: pip install feedparser requests beautifulsoup4 urllib3 google-genai groq ddgs jinja2 pillow playwright playwright-stealth
 
-      - name: Criar .env com a chave Gemini
-        run: echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+      - name: Criar .env com as chaves de API
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+          echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
+          echo "SITE_BASE_URL=https://www.resenhadanacao.com.br" >> .env
 
       - name: Extrair notícias (Coluna do Fla + Globo Esporte)
         run: |
@@ -92,3 +95,11 @@ jobs:
       - name: Publicar no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Instalar Chromium para Playwright
+        run: playwright install chromium --with-deps
+
+      - name: Postar no X (Twitter)
+        env:
+          X_SESSION_JSON: ${{ secrets.X_SESSION_JSON }}
+        run: python x_creator/x_ci_publisher_0_1.py

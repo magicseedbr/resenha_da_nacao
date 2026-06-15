@@ -3,7 +3,7 @@ import json
 import shutil
 import subprocess
 from datetime import datetime
-import google.generativeai as genai
+from google import genai
 from groq import Groq
 from PIL import Image, ImageDraw, ImageFont
 
@@ -28,7 +28,7 @@ def read_from_git(git_path):
     try:
         result = subprocess.run(
             ["git", "show", f"origin/main:{git_path}"],
-            cwd=os.path.dirname(os.path.dirname(SCRIPT_DIR)),
+            cwd=os.path.dirname(SCRIPT_DIR),
             capture_output=True,
             text=True,
             check=True
@@ -302,11 +302,11 @@ Responda com este JSON exato:
 def _generate_via_gemini(prompt):
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY não definida")
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-    response = model.generate_content(
-        prompt,
-        generation_config={"response_mime_type": "application/json"}
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model=GEMINI_MODEL_NAME,
+        contents=prompt,
+        config={"response_mime_type": "application/json"},
     )
     return json.loads(response.text).get("caption", "")
 
@@ -346,6 +346,13 @@ def generate_caption(article_data, persona_content, editoria):
         return ""
 
 
+def folder_name(entry):
+    """Retorna o nome da pasta: YYYY-MM-DD_<slug>."""
+    approved_at = entry.get("approved_at", "")
+    date_str = approved_at[:10] if approved_at else datetime.now().strftime("%Y-%m-%d")
+    return f"{date_str}_{entry.get('slug', '')}"
+
+
 def process_article(entry, published):
     slug = entry.get("slug", "")
     editoria = entry.get("editoria", "geral")
@@ -381,7 +388,8 @@ def process_article(entry, published):
         print(f"  [Erro] Falha ao gerar legenda.")
         return False
 
-    post_dir = os.path.join(OUTPUT_DIR, slug)
+    dirname = folder_name(entry)
+    post_dir = os.path.join(OUTPUT_DIR, dirname)
     os.makedirs(post_dir, exist_ok=True)
 
     with open(os.path.join(post_dir, "caption.txt"), "w", encoding="utf-8") as f:
@@ -408,7 +416,7 @@ def process_article(entry, published):
     with open(os.path.join(post_dir, "post_data.json"), "w", encoding="utf-8") as f:
         json.dump(post_data, f, ensure_ascii=False, indent=4)
 
-    print(f"  [OK] Salvo em: instagram_posts/{slug}/  ({len(caption)} caracteres)")
+    print(f"  [OK] Salvo em: instagram_posts/{dirname}/  ({len(caption)} caracteres)")
     return True
 
 
