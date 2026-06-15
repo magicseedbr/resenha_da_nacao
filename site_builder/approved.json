@@ -208,5 +208,12 @@
         "editoria": "base",
         "approved_at": "2026-06-15T02:05:00.625963",
         "cover": "static/covers/arrascaeta-fora-mermao-ate-lesionado-o-mengao-ta-no-centro-do-mundo.webp"
+    },
+    {
+        "file": "article_20260615_122703.json",
+        "slug": "a-nacao-veste-a-amarelinha-nossos-filhos-em-campo-o-coracao-rubro-negro-pulsando-forte",
+        "editoria": "base",
+        "approved_at": "2026-06-15T12:27:03.574682",
+        "cover": "static/covers/a-nacao-veste-a-amarelinha-nossos-filhos-em-campo-o-coracao-rubro-negro-pulsando-forte.webp"
     }
 ]
