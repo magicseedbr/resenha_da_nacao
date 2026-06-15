@@ -201,5 +201,12 @@
         "editoria": "base",
         "approved_at": "2026-06-14T22:46:46.025836",
         "cover": "static/covers/e-hexa-ou-nada-paqueta-deita-na-selecao-e-o-fla-manda-o-papo-reto-na-copa-do-mundo.webp"
+    },
+    {
+        "file": "article_20260615_020458.json",
+        "slug": "arrascaeta-fora-mermao-ate-lesionado-o-mengao-ta-no-centro-do-mundo",
+        "editoria": "base",
+        "approved_at": "2026-06-15T02:05:00.625963",
+        "cover": "static/covers/arrascaeta-fora-mermao-ate-lesionado-o-mengao-ta-no-centro-do-mundo.webp"
     }
 ]
