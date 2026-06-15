@@ -280,10 +280,11 @@ def process_article(entry, posted):
 
     tweet_file = os.path.join(post_dir, "tweet.txt")
 
-    # Tweet já foi gerado mas não postado — re-enfileira sem chamar a API
+    # Tweet já existe (gerado em run anterior) — não re-enfileira automaticamente;
+    # use x_publish_0_1.py localmente para posts perdidos
     if os.path.exists(tweet_file):
-        print("  [Re-fila] Tweet já gerado, aguardando publicação.")
-        return dirname
+        print("  [Ignorado] Tweet já gerado em run anterior (não repostado automaticamente).")
+        return None
 
     # Tweet ainda não existe — gera agora
     try:
