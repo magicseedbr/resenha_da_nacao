@@ -215,5 +215,12 @@
         "editoria": "base",
         "approved_at": "2026-06-15T12:27:03.574682",
         "cover": "static/covers/a-nacao-veste-a-amarelinha-nossos-filhos-em-campo-o-coracao-rubro-negro-pulsando-forte.webp"
+    },
+    {
+        "file": "article_20260615_145204.json",
+        "slug": "mengao-na-copa-varela-em-campo-arrascaeta-maltratado-a-nacao-nao-esquece",
+        "editoria": "selecao",
+        "approved_at": "2026-06-15T14:52:04.867629",
+        "cover": "static/covers/mengao-na-copa-varela-em-campo-arrascaeta-maltratado-a-nacao-nao-esquece.webp"
     }
 ]
