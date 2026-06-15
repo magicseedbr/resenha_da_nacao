@@ -19,7 +19,6 @@ import base64
 import tempfile
 import time
 import random
-import subprocess
 from datetime import datetime
 from PIL import Image
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
@@ -54,29 +53,7 @@ def save_published(published):
 
 # ── Posts pendentes ───────────────────────────────────────────────────────────
 
-def get_new_in_last_commit():
-    """Retorna o conjunto de dirnames cujo tweet.txt foi adicionado no último commit."""
-    try:
-        result = subprocess.run(
-            ["git", "diff", "HEAD~1", "--name-only"],
-            cwd=REPO_DIR, capture_output=True, text=True, check=True,
-        )
-        new_dirs = set()
-        for line in result.stdout.splitlines():
-            parts = line.split("/")
-            # x_creator/x_posts/<dirname>/tweet.txt
-            if (len(parts) == 4 and parts[0] == "x_creator"
-                    and parts[1] == "x_posts" and parts[3] == "tweet.txt"):
-                new_dirs.add(parts[2])
-        return new_dirs
-    except subprocess.CalledProcessError as e:
-        print(f"[Aviso] git diff falhou: {e} — processando todos os pendentes")
-        return None
-
-
 def get_pending(published):
-    new_in_commit = get_new_in_last_commit()
-
     pending = []
     for dirname in sorted(os.listdir(POSTS_DIR)):
         post_dir = os.path.join(POSTS_DIR, dirname)
@@ -85,9 +62,6 @@ def get_pending(published):
         if not os.path.exists(os.path.join(post_dir, "tweet.txt")):
             continue
         if dirname in published:
-            continue
-        # Se conseguimos detectar o commit, só posta o que é novo nele
-        if new_in_commit is not None and dirname not in new_in_commit:
             continue
         pending.append(dirname)
     return pending
