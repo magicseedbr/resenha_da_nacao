@@ -24,8 +24,9 @@ from groq import Groq
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # ── Constantes ────────────────────────────────────────────────────────────────
-OUTPUT_DIR     = os.path.join(SCRIPT_DIR, "x_posts")
-PUBLISHED_FILE = os.path.join(OUTPUT_DIR, "published_x.json")
+OUTPUT_DIR      = os.path.join(SCRIPT_DIR, "x_posts")
+PUBLISHED_FILE  = os.path.join(OUTPUT_DIR, "published_x_posted.json")  # fonte da verdade: já postado no X
+TO_POST_FILE    = os.path.join(OUTPUT_DIR, "to_post.json")
 PERSONAS_DIR   = os.path.abspath(os.path.join(SCRIPT_DIR, "../article_writer/personas"))
 COVERS_DIR     = os.path.abspath(os.path.join(SCRIPT_DIR, "../site_builder/static/covers"))
 
@@ -104,21 +105,17 @@ def find_cover(slug):
     return None, None
 
 
-# ── Publicados ────────────────────────────────────────────────────────────────
+# ── Publicados (já postados no X) ────────────────────────────────────────────
 
 def load_published():
+    """Retorna dict {dirname: {...}} dos posts já publicados no X."""
     if not os.path.exists(PUBLISHED_FILE):
-        return []
+        return {}
     try:
         with open(PUBLISHED_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except (json.JSONDecodeError, IOError):
-        return []
-
-
-def save_published(published):
-    with open(PUBLISHED_FILE, "w", encoding="utf-8") as f:
-        json.dump(published, f, ensure_ascii=False, indent=4)
+        return {}
 
 
 # ── Personas ──────────────────────────────────────────────────────────────────
@@ -268,20 +265,32 @@ def folder_name(entry):
     return f"{date_str}_{entry.get('slug', '')}"
 
 
-def process_article(entry, published):
+def process_article(entry, posted):
+    """Gera ou re-enfileira o post. Retorna dirname se deve ser postado, None caso contrário."""
     slug     = entry.get("slug", "")
     editoria = entry.get("editoria", "geral")
     file_    = entry.get("file", "")
+    dirname  = folder_name(entry)
+    post_dir = os.path.join(OUTPUT_DIR, dirname)
 
-    if slug in published:
-        print("  [Ignorado] Já processado.")
-        return False
+    # Já foi postado no X — pula
+    if dirname in posted:
+        print("  [Ignorado] Já publicado no X.")
+        return None
 
+    tweet_file = os.path.join(post_dir, "tweet.txt")
+
+    # Tweet já foi gerado mas não postado — re-enfileira sem chamar a API
+    if os.path.exists(tweet_file):
+        print("  [Re-fila] Tweet já gerado, aguardando publicação.")
+        return dirname
+
+    # Tweet ainda não existe — gera agora
     try:
         article_json = read_json_from_git(f"article_writer/generated_articles/{file_}")
     except IOError as e:
         print(f"  [Erro] {e}")
-        return False
+        return None
 
     author       = article_json.get("author", "")
     article_data = article_json.get("article", {})
@@ -300,15 +309,13 @@ def process_article(entry, published):
 
     if not tweet_text:
         print("  [Erro] Falha ao gerar tweet.")
-        return False
+        return None
 
     full_tweet, char_count = assemble_tweet(tweet_text, slug)
 
-    dirname  = folder_name(entry)
-    post_dir = os.path.join(OUTPUT_DIR, dirname)
     os.makedirs(post_dir, exist_ok=True)
 
-    with open(os.path.join(post_dir, "tweet.txt"), "w", encoding="utf-8") as f:
+    with open(tweet_file, "w", encoding="utf-8") as f:
         f.write(full_tweet)
 
     if cover_src:
@@ -329,13 +336,10 @@ def process_article(entry, published):
 
     img_info = f"image.{cover_ext}" if cover_src else "sem imagem"
     print(f"  [OK] Salvo em x_posts/{dirname}/  ({char_count}/280 chars, {img_info})")
-    return True
+    return dirname
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
-
-TO_POST_FILE = os.path.join(OUTPUT_DIR, "to_post.json")
-
 
 def save_to_post_queue(dirnames):
     with open(TO_POST_FILE, "w", encoding="utf-8") as f:
@@ -352,26 +356,19 @@ def main():
         return
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    published = load_published()
-    new_posts = 0
-    new_dirnames = []
+    posted = load_published()   # {dirname: {...}} dos já publicados no X
+    queue  = []
 
     for entry in approved:
         slug = entry.get("slug", "")
         print(f"-> {slug[:70]}")
-        created = process_article(entry, published)
-        if created:
-            published.append(slug)
-            save_published(published)
-            new_dirnames.append(folder_name(entry))
-            new_posts += 1
+        dirname = process_article(entry, posted)
+        if dirname:
+            queue.append(dirname)
 
-    # Grava fila explícita para o CI publisher (sobrescreve sempre)
-    save_to_post_queue(new_dirnames)
-    if new_dirnames:
-        print(f"  Fila to_post.json: {new_dirnames}")
-
-    print(f"\n--- Concluído: {new_posts} post(s) novo(s) criado(s) ---")
+    save_to_post_queue(queue)
+    print(f"\nFila to_post.json: {queue}")
+    print(f"--- Concluído: {len(queue)} post(s) na fila ---")
 
 
 if __name__ == "__main__":
