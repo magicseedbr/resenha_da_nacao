@@ -28,13 +28,33 @@ SCRIPT_DIR     = os.path.dirname(os.path.abspath(__file__))
 REPO_DIR       = os.path.dirname(SCRIPT_DIR)
 POSTS_DIR      = os.path.join(SCRIPT_DIR, "x_posts")
 COVERS_DIR     = os.path.join(REPO_DIR, "site_builder", "static", "covers")
+TO_POST_FILE   = os.path.join(POSTS_DIR, "to_post.json")
 PUBLISHED_FILE = os.path.join(POSTS_DIR, "published_x_posted.json")
 
 X_SESSION_JSON = os.environ.get("X_SESSION_JSON", "")
 _STEALTH       = Stealth(navigator_user_agent=False)
 
 
-# ── Publicados ────────────────────────────────────────────────────────────────
+# ── Fila explícita ────────────────────────────────────────────────────────────
+
+def load_queue():
+    """Lê to_post.json — lista de dirnames gerados nesta execução do pipeline."""
+    if not os.path.exists(TO_POST_FILE):
+        return []
+    try:
+        with open(TO_POST_FILE) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError):
+        return []
+
+
+def clear_queue():
+    """Remove to_post.json após publicação bem-sucedida."""
+    if os.path.exists(TO_POST_FILE):
+        os.remove(TO_POST_FILE)
+
+
+# ── Log de publicados ─────────────────────────────────────────────────────────
 
 def load_published():
     if not os.path.exists(PUBLISHED_FILE):
@@ -51,17 +71,19 @@ def save_published(published):
         json.dump(published, f, ensure_ascii=False, indent=4)
 
 
-# ── Posts pendentes ───────────────────────────────────────────────────────────
+# ── Posts a publicar ──────────────────────────────────────────────────────────
 
-def get_pending(published):
+def get_pending():
+    """Retorna só o que está na fila explícita desta execução."""
+    queue = load_queue()
     pending = []
-    for dirname in sorted(os.listdir(POSTS_DIR)):
+    for dirname in queue:
         post_dir = os.path.join(POSTS_DIR, dirname)
         if not os.path.isdir(post_dir):
+            print(f"  [Aviso] Pasta não encontrada: {dirname}")
             continue
         if not os.path.exists(os.path.join(post_dir, "tweet.txt")):
-            continue
-        if dirname in published:
+            print(f"  [Aviso] tweet.txt ausente: {dirname}")
             continue
         pending.append(dirname)
     return pending
@@ -224,23 +246,21 @@ def main():
 
     if not X_SESSION_JSON:
         print("[Erro] X_SESSION_JSON não definido.")
-        print("       Gere: base64 -i x_creator/x_session.json | tr -d '\\n'")
-        print("       Adicione como GitHub Secret X_SESSION_JSON.")
         sys.exit(1)
 
-    published = load_published()
-    pending   = get_pending(published)
+    pending = get_pending()
 
     if not pending:
-        print("Nenhum post novo em x_posts/. Encerrando.")
+        print("Fila to_post.json vazia ou ausente. Nada a publicar.")
         return
 
-    print(f"\n{len(pending)} post(s) para publicar:")
+    print(f"\n{len(pending)} post(s) na fila:")
     for d in pending:
         print(f"  - {d}")
 
     session_path = write_session_file()
-    posted = 0
+    published    = load_published()
+    posted       = 0
 
     try:
         with sync_playwright() as pw:
@@ -295,6 +315,9 @@ def main():
     finally:
         if session_path:
             os.unlink(session_path)
+
+    # Remove a fila — independente de sucesso parcial, não reposta na próxima execução
+    clear_queue()
 
     print("=" * 60)
     print(f" Concluído. {posted}/{len(pending)} post(s) publicado(s).")

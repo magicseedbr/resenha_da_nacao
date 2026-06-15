@@ -334,6 +334,14 @@ def process_article(entry, published):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+TO_POST_FILE = os.path.join(OUTPUT_DIR, "to_post.json")
+
+
+def save_to_post_queue(dirnames):
+    with open(TO_POST_FILE, "w", encoding="utf-8") as f:
+        json.dump(dirnames, f, ensure_ascii=False, indent=4)
+
+
 def main():
     print("--- Criador de Posts para o X ---\n")
 
@@ -346,6 +354,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     published = load_published()
     new_posts = 0
+    new_dirnames = []
 
     for entry in approved:
         slug = entry.get("slug", "")
@@ -354,7 +363,13 @@ def main():
         if created:
             published.append(slug)
             save_published(published)
+            new_dirnames.append(folder_name(entry))
             new_posts += 1
+
+    # Grava fila explícita para o CI publisher (sobrescreve sempre)
+    save_to_post_queue(new_dirnames)
+    if new_dirnames:
+        print(f"  Fila to_post.json: {new_dirnames}")
 
     print(f"\n--- Concluído: {new_posts} post(s) novo(s) criado(s) ---")
 

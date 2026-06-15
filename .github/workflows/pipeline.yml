@@ -78,7 +78,7 @@ jobs:
           git add article_writer/elenco_flamengo.json || true
           git add article_writer/generated_articles/ || true
           git add site_builder/approved.json site_builder/static/covers/ || true
-          git add x_creator/x_posts/ || true
+          git add x_creator/x_posts/to_post.json || true
           git diff --cached --quiet && echo "Sem novidades para commitar." && exit 0
           git commit -m "Pipeline: novo artigo publicado"
           git push
@@ -115,6 +115,7 @@ jobs:
         continue-on-error: true
         run: |
           git add x_creator/x_posts/published_x_posted.json || true
+          git rm --cached x_creator/x_posts/to_post.json 2>/dev/null || true
           git diff --cached --quiet && exit 0
-          git commit -m "X: registra posts publicados"
+          git commit -m "X: registra posts publicados e limpa fila"
           git push
