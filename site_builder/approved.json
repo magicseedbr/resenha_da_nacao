@@ -229,5 +229,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-16T16:13:52.743072",
         "cover": "static/covers/cade-o-9-selecao-pedro-e-flamengo-e-a-nacao-nao-esquece.webp"
+    },
+    {
+        "file": "article_20260616_235528.json",
+        "slug": "o-flamengo-invadiu-a-selecao-mengaonomundoereal",
+        "editoria": "base",
+        "approved_at": "2026-06-16T23:55:28.770445",
+        "cover": "static/covers/o-flamengo-invadiu-a-selecao-mengaonomundoereal.webp"
     }
 ]
