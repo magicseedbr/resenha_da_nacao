@@ -222,5 +222,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-15T14:52:04.867629",
         "cover": "static/covers/mengao-na-copa-varela-em-campo-arrascaeta-maltratado-a-nacao-nao-esquece.webp"
+    },
+    {
+        "file": "article_20260616_161352.json",
+        "slug": "cade-o-9-selecao-pedro-e-flamengo-e-a-nacao-nao-esquece",
+        "editoria": "selecao",
+        "approved_at": "2026-06-16T16:13:52.743072",
+        "cover": "static/covers/cade-o-9-selecao-pedro-e-flamengo-e-a-nacao-nao-esquece.webp"
     }
 ]
