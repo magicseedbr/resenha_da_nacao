@@ -243,5 +243,12 @@
         "editoria": "base",
         "approved_at": "2026-06-17T18:07:41.068957",
         "cover": "static/covers/o-manto-sagrado-pelo-mundo-nossos-guerreiros-honram-a-nacao-na-copa.jpg"
+    },
+    {
+        "file": "article_20260617_235705.json",
+        "slug": "das-trevas-a-luz-a-nacao-e-o-renascer-de-plata-para-o-mundo",
+        "editoria": "selecao",
+        "approved_at": "2026-06-17T23:57:05.679473",
+        "cover": "static/covers/das-trevas-a-luz-a-nacao-e-o-renascer-de-plata-para-o-mundo.jpg"
     }
 ]
