@@ -236,5 +236,12 @@
         "editoria": "base",
         "approved_at": "2026-06-16T23:55:28.770445",
         "cover": "static/covers/o-flamengo-invadiu-a-selecao-mengaonomundoereal.webp"
+    },
+    {
+        "file": "article_20260617_180740.json",
+        "slug": "o-manto-sagrado-pelo-mundo-nossos-guerreiros-honram-a-nacao-na-copa",
+        "editoria": "base",
+        "approved_at": "2026-06-17T18:07:41.068957",
+        "cover": "static/covers/o-manto-sagrado-pelo-mundo-nossos-guerreiros-honram-a-nacao-na-copa.jpg"
     }
 ]
