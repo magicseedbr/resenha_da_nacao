@@ -47,23 +47,58 @@ def sanitize_filename(title):
     clean_title = re.sub(r'[\\/*?:"<>|]', "", title).strip()
     return clean_title.replace(" ", "_")
 
+def parse_iso_local_date(iso_str):
+    """Converte uma data ISO (com ou sem fuso / 'Z') para a data no fuso local.
+    Retorna None se não der pra parsear."""
+    if not iso_str:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso_str.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is not None:
+        dt = dt.astimezone()  # normaliza para o fuso local antes de pegar a data
+    return dt.date()
+
+def extract_published_date(soup):
+    """Extrai a data de publicação real da matéria do Globo.
+    Tenta meta article:published_time, depois itemprop datePublished, depois <time>.
+    Retorna um datetime.date (no fuso local) ou None se não encontrar."""
+    candidates = []
+    meta = soup.find('meta', attrs={'property': 'article:published_time'})
+    if meta and meta.get('content'):
+        candidates.append(meta['content'])
+    meta = soup.find('meta', attrs={'itemprop': 'datePublished'})
+    if meta and meta.get('content'):
+        candidates.append(meta['content'])
+    time_tag = soup.find('time', attrs={'datetime': True})
+    if time_tag and time_tag.get('datetime'):
+        candidates.append(time_tag['datetime'])
+
+    for raw in candidates:
+        parsed = parse_iso_local_date(raw)
+        if parsed:
+            return parsed
+    return None
+
 def fetch_article_body(url):
-    """Worker function tasked with downloading and parsing a single article body."""
+    """Baixa e parseia uma matéria. Retorna (full_text, published_date|None)."""
     try:
         response = requests.get(url, headers=GLOBO_HEADERS, timeout=8)
         if response.status_code != 200:
-            return ""
-            
+            return "", None
+
         soup = BeautifulSoup(response.text, 'html.parser')
+        published_date = extract_published_date(soup)
+
         paragraphs = soup.find_all('p', class_='content-text__paragraph')
-        
         if not paragraphs:
             paragraphs = soup.find_all('p')
-            
+
         clean_paragraphs = [p.get_text().strip() for p in paragraphs if len(p.get_text().strip()) > 45]
-        return "\n\n".join(clean_paragraphs)
+        return "\n\n".join(clean_paragraphs), published_date
     except Exception:
-        return ""
+        return "", None
 
 def extract_links_from_page(url):
     """Harvests target links from a given index landing page."""
@@ -116,20 +151,29 @@ def scale_ingestion_pipeline():
         # Map URLs to their respective processing futures
         future_to_url = {executor.submit(fetch_article_body, url): (url, title) for url, title in discovered_items.items()}
         
+        today = datetime.now().date()
         for future in as_completed(future_to_url):
             url, title = future_to_url[future]
             try:
-                full_text = future.result()
-                
+                full_text, published_date = future.result()
+
                 if not full_text or len(full_text) < 200:
                     continue # Drop empty payloads or blocks
-                    
+
+                # Só dia corrente: sem data confirmada OU data != hoje -> descarta (regra rigorosa)
+                if published_date != today:
+                    if published_date is None:
+                        print(f" [Pulado: sem data] -> {title[:50]}...")
+                    else:
+                        print(f" [Pulado: {published_date}] -> {title[:50]}...")
+                    continue
+
                 # Schema serialization
                 news_data = {
                     "title": title,
                     "source_name": "Globo Esporte Cluster",
                     "source_url": url,
-                    "published_at": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+                    "published_at": published_date.isoformat(),
                     "full_text": full_text,
                     "extracted_at": datetime.now().isoformat()
                 }

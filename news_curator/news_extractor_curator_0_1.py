@@ -151,6 +151,16 @@ def select_best_story_via_gemini(top_stories):
         # Secure execution state fallback logic: return the absolute top 1 item by default
         return top_stories[0], "Seleção baseada estritamente no ranking matemático do Hype Score (Fallback devido a falha na API)."
 
+def is_extracted_today(news_item):
+    """True se o artigo foi extraído hoje (campo 'extracted_at' em ISO).
+    Garante que o curador só considere notícias do dia corrente, mesmo que
+    raw_news/ contenha arquivos de dias anteriores. Sem data válida -> False."""
+    raw = news_item.get("extracted_at", "")
+    try:
+        return datetime.fromisoformat(raw).date() == datetime.now().date()
+    except (ValueError, TypeError):
+        return False
+
 def load_used_urls():
     if not os.path.exists(USED_STORIES_FILE):
         return set()
@@ -180,12 +190,21 @@ def main():
         print("[Execução Interrompida] Nenhuma notícia encontrada na pasta de entrada.")
         return
 
+    # Só dia corrente: descarta arquivos de raw_news/ que não foram extraídos hoje
+    total_before = len(news_pool)
+    news_pool = [n for n in news_pool if is_extracted_today(n)]
+    print(f" Notícias do dia corrente: {len(news_pool)} (descartadas {total_before - len(news_pool)} de outros dias)")
+
+    if not news_pool:
+        print("[Execução Interrompida] Nenhuma notícia de hoje em raw_news/. Rode os extratores hoje.")
+        return
+
     used_urls = load_used_urls()
     news_pool = [n for n in news_pool if n.get('source_url') not in used_urls]
     print(f" Notícias ainda não usadas: {len(news_pool)} (excluídas {len(used_urls)} já publicadas)")
 
     if not news_pool:
-        print("[Execução Interrompida] Todas as notícias disponíveis já foram usadas. Rode os extratores para obter novas.")
+        print("[Execução Interrompida] Todas as notícias de hoje já foram usadas. Rode os extratores para obter novas.")
         return
 
     print("\n--- Calculando Algoritmo de Hype Score ---")

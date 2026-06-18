@@ -1,16 +1,17 @@
 import os
 import re
 import json
+import calendar
 import requests
 import feedparser
 from bs4 import BeautifulSoup
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Configuration - Define how deep into history you want to go
-# 1 page = ~10 to 20 articles. Range(1, 15) will fetch up to 200-300 historical articles instantly.
+# Configuration - Só buscamos notícias do DIA CORRENTE; o RSS é cronológico,
+# então poucas páginas bastam (e paramos cedo ao passar do dia de hoje).
 START_PAGE = 1
-END_PAGE = 15  
+END_PAGE = 6
 MAX_WORKERS = 12  # High concurrency for bulk downloading
 
 BASE_FEED_URL = "https://colunadofla.com/feed/?paged="
@@ -39,6 +40,17 @@ def sanitize_filename(title):
     clean_title = re.sub(r'[\\/*?:"<>|]', "", title).strip()
     return clean_title.replace(" ", "_")
 
+def is_published_today(published_parsed):
+    """True se a data do entry (struct_time UTC do feedparser) for o dia local de hoje.
+    Sem data parseável -> False (descartamos, conforme regra de só dia corrente)."""
+    if not published_parsed:
+        return False
+    try:
+        local_date = datetime.fromtimestamp(calendar.timegm(published_parsed)).date()
+    except (ValueError, OverflowError, TypeError):
+        return False
+    return local_date == datetime.now().date()
+
 def fetch_article_body(url):
     """Worker task to scrape and clean the full text from a specific article link."""
     try:
@@ -55,14 +67,14 @@ def fetch_article_body(url):
 def run_bulk_pipeline():
     history = set(load_history())
     discovered_articles = {}
-    
-    print(f"[{datetime.now()}] Starting Bulk Discovery Phase across {END_PAGE - START_PAGE} feed pages...")
-    
-    # Step 1: Deep dive into historical RSS pages
+
+    print(f"[{datetime.now()}] Discovery Phase — apenas notícias de hoje ({datetime.now().date()})...")
+
+    # Step 1: Varre o RSS (cronológico) coletando SÓ entries de hoje
     for page in range(START_PAGE, END_PAGE):
         target_feed = f"{BASE_FEED_URL}{page}"
         print(f" -> Crawling Feed Page {page}: {target_feed}")
-        
+
         try:
             response = requests.get(target_feed, headers=HTTP_HEADERS, timeout=10)
             if response.status_code == 404:
@@ -70,9 +82,13 @@ def run_bulk_pipeline():
                 break
             if response.status_code != 200:
                 continue
-                
+
             feed = feedparser.parse(response.content)
+            today_in_page = 0
             for entry in feed.entries:
+                if not is_published_today(entry.get('published_parsed')):
+                    continue
+                today_in_page += 1
                 link = entry.link
                 title = entry.title
                 if link not in history and link not in discovered_articles:
@@ -81,12 +97,18 @@ def run_bulk_pipeline():
                         "published": entry.get('published', 'Unknown Date'),
                         "summary": entry.get('summary', '')
                     }
+
+            # RSS é reverso-cronológico: se uma página inteira já não tem nada de
+            # hoje e já coletamos algo, passamos do dia corrente — pode parar.
+            if today_in_page == 0 and discovered_articles:
+                print(f"    [Fim do dia corrente] Página sem itens de hoje. Encerrando varredura.")
+                break
         except Exception as e:
             print(f"    [Error] Failed to read feed page {page}: {e}")
             continue
 
     total_tasks = len(discovered_articles)
-    print(f"\nDiscovery complete. Found {total_tasks} historical un-processed articles.")
+    print(f"\nDiscovery complete. Found {total_tasks} artigos de hoje ainda não processados.")
     if total_tasks == 0:
         return
 

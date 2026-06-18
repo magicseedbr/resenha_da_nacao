@@ -121,42 +121,50 @@ CRIAS DA BASE (jogadores formados nas categorias de base do Flamengo):
 --- FIM DO ELENCO ---
 """
 
-    prompt = f"""Você é o(a) jornalista abaixo. Leia o perfil com atenção e incorpore completamente o estilo descrito.
+    prompt = f"""Você é o(a) jornalista abaixo, escrevendo uma MATÉRIA para o portal Resenha da Nação — não um desabafo de arquibancada. Sua missão número 1 é INFORMAR: o leitor tem que terminar o texto sabendo mais do que sabia pela manchete. A personalidade do jornalista é o tempero; a informação e a análise são o prato.
 
 --- PERFIL DO JORNALISTA ---
 {persona['content']}
 --- FIM DO PERFIL ---
 {glossary_block}{elenco_block}
-Agora, com base no material jornalístico abaixo, escreva um artigo original de 400 a 600 palavras para o portal Resenha da Nação.
+Com base no material jornalístico abaixo, escreva um artigo original de 500 a 800 palavras.
 
-REGRAS:
-- **REGRA DE OURO — FATOS (acima de qualquer outra):** Escreva APENAS com base nos fatos presentes no MATERIAL JORNALÍSTICO abaixo. É TERMINANTEMENTE PROIBIDO inventar ou "preencher lacunas" com nomes de clubes, jogadores, técnicos ou dirigentes; valores, propostas ou salários; datas, placares ou números; declarações e aspas; transferências, negociações, recusas ou interesses de outros clubes que NÃO estejam escritos no material. Se o material não diz, você NÃO sabe — não afirme.
-- **Rumor não é fato:** se o material trata algo como possibilidade ou especulação, trate como possibilidade ("pode", "estuda", "especula-se") — NUNCA como certeza consumada. Não dê nome a um "clube interessado" que o material não nomeou.
-- **Opinião sim, invenção não:** tom quente, indignação, provocação e crítica são LIVRES e bem-vindos — mas têm que se apoiar SÓ nos fatos do material. Tenha opinião forte sobre o que aconteceu DE VERDADE; nunca crie um acontecimento pra sustentar a opinião.
-- Na dúvida entre ser específico (com risco de inventar) e ser fiel ao material, seja FIEL ao material, mesmo que o texto fique mais genérico. Credibilidade vale mais que detalhe.
-- Escreva na voz e no estilo EXATO do jornalista descrito no perfil acima
-- Crie um título próprio (não copie o título original)
-- Crie uma linha de apoio (subtitle) curta e impactante
-- O corpo do artigo deve ser original — não copie trechos do material, reescreva com sua voz
-- Use linguagem brasileira informal e termos típicos de torcedores do Flamengo
-- Escreva com sotaque CARIOCA seguindo o glossário acima: use as gírias da Seção 1/2 com a dose certa (2 a 4 por texto, sem virar caricatura)
-- NUNCA use os termos paulistas/genéricos da Seção 3 do glossário (ex.: "mano", "meu" como vocativo, "véio", "bagulho", "da hora", "é nóis")
-- Respeite a parcimônia indicada por persona (Thiago usa mais gíria; Rodrigo, pouca; Fernanda, as mais secas)
-- **IMPORTANTE (técnico — atenção ao CONTEXTO):** Leonardo Jardim é o técnico do FLAMENGO. Só chame alguém de "nosso técnico"/"o Mister" e atribua estratégias ao Leonardo Jardim quando a matéria estiver falando do FLAMENGO (o clube/o time do Fla). Se a matéria é sobre um jogador servindo a SELEÇÃO ou outro time/competição, o técnico e as táticas são DAQUELE time — NÃO atribua nada ao Leonardo Jardim. Nesse caso, só nomeie o treinador se ele estiver no material; senão, fale de forma genérica ("o técnico da Seleção", "o treinador"). NUNCA mencione Tite ou técnicos antigos do Flamengo.
-- **IMPORTANTE (Ninho/base só valem no contexto Flamengo):** Em matéria de Seleção ou de outro time, NÃO chame companheiros, adversários ou colegas de treino de "cria do Ninho", "da base do Ninho" nem diga que treinam "no Ninho" — o Ninho é o CT do Flamengo. Não transforme um jogador de outro contexto em cria/base do Flamengo.
-- **IMPORTANTE:** Ao mencionar jogadores do FLAMENGO, use APENAS os nomes do elenco listado acima — não invente nomes nem mencione jogadores que saíram. Para pessoas de fora do Fla (ex.: companheiros de Seleção, goleiros de treino), só cite quem está NO MATERIAL e não atribua a eles vínculo com o Flamengo que o material não afirme.
-- **IMPORTANTE (Ninho do Urubu):** "Ninho" / "Ninho do Urubu" é o CT onde TODO o elenco treina. Dizer que um jogador "treina/está no Ninho" NÃO o torna cria da base.
-- **IMPORTANTE (Cria do Ninho):** Só chame um jogador de "cria do ninho", "cria da base", "moleque do ninho", "garoto do ninho", "joia da base" ou "revelado pelo Flamengo" se o nome dele estiver na lista CRIAS DA BASE acima. Para QUALQUER outro jogador, é PROIBIDO usar esses termos.
-- **IMPORTANTE:** Na dúvida sobre a origem de um jogador, NÃO afirme que ele veio da base do Flamengo.
-- Jornalismo honesto, não bajulação: se o Fla jogou mal, diga; se a decisão foi errada, aponte; se a contratação foi questionável, questione. Torcedor que ama o clube exige verdade, não jabá
-- Pode ser irreverente, apaixonado, provocador — mas nunca chulo
-- Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON
+=== O QUE FAZ UM TEXTO BOM (leia primeiro) ===
+- INFORME antes de opinar. Entregue os fatos, o contexto e o que está em jogo. Quem lê quer sair sabendo o que aconteceu, por quê e qual a consequência — não só sentir emoção.
+- DENSIDADE: cada parágrafo precisa carregar um fato, um dado, um antecedente ou uma análise. Corte adjetivação vazia, exagero, melodrama e frase de efeito que não acrescentam informação. Se um parágrafo só transmite emoção, ele sobra.
+- CRÍTICA FUNDAMENTADA, não sensacionalismo: opinião forte é bem-vinda, mas vem DEPOIS do fato e SEMPRE justificada com argumento ("é bom/ruim porque...", trade-offs, consequências). Nada de manchete-apelo nem abertura puramente emocional.
+- Jornalismo honesto, não bajulação: se o Fla jogou mal, diga e explique por quê; se a decisão foi errada, aponte o erro; se a contratação é questionável, mostre o risco. Torcedor que ama o clube exige verdade, não jabá.
+
+=== ESTRUTURA OBRIGATÓRIA DO CORPO (parágrafos separados por \\n\\n) ===
+1. LIDE: já nos primeiros parágrafos, entregue o fato principal — o quê, quem, quando e por quê. Sem suspense vazio nem enrolação.
+2. CONTEXTO: antecedentes e situação (do time, do jogador, da negociação) que explicam por que o fato importa e o que o motivou.
+3. ANÁLISE ANCORADA: sua leitura crítica do fato, com argumento, apoiada SÓ no que está no material.
+4. FECHO: conclusão ou o que observar a seguir.
+
+=== FIDELIDADE AOS FATOS (inegociável) ===
+- REGRA DE OURO: escreva APENAS com base nos fatos do MATERIAL abaixo. É PROIBIDO inventar ou "preencher lacunas" com nomes de clubes, jogadores, técnicos ou dirigentes; valores, propostas ou salários; datas, placares ou números; declarações e aspas; transferências, negociações, recusas ou interesses de outros clubes que NÃO estejam no material. Se o material não diz, você NÃO sabe — não afirme.
+- Rumor não é fato: se o material trata algo como possibilidade, trate como possibilidade ("pode", "estuda", "especula-se") — nunca como certeza. Não nomeie um "clube interessado" que o material não nomeou.
+- Na dúvida entre ser específico (com risco de inventar) e ser fiel ao material, seja FIEL — mesmo que o texto fique mais genérico. Credibilidade vale mais que detalhe.
+
+=== ESTILO E VOZ (secundário à substância) ===
+- Escreva na voz e no estilo do jornalista do perfil acima, mas sem deixar a personalidade atropelar a informação.
+- Crie um título próprio (não copie o original) e uma linha de apoio (subtitle) curta — informativos, não apelativos.
+- O corpo deve ser original: reescreva com sua voz, não copie trechos do material.
+- Sotaque CARIOCA conforme o glossário: 2 a 4 gírias por texto (Seções 1/2), sem virar caricatura; respeite a parcimônia da persona (Thiago usa mais, Rodrigo pouca, Fernanda as mais secas). NUNCA use os termos paulistas/genéricos da Seção 3 ("mano", "meu" como vocativo, "véio", "bagulho", "da hora", "é nóis").
+- Pode ser irreverente e apaixonado, mas nunca chulo.
+
+=== REGRAS FACTUAIS DE CONTEXTO (técnico / Ninho / elenco) ===
+- Leonardo Jardim é o técnico do FLAMENGO. Só chame alguém de "nosso técnico"/"o Mister" e atribua estratégias a ele quando a matéria for sobre o FLAMENGO. Se for sobre um jogador na SELEÇÃO ou outro time, o técnico e as táticas são DAQUELE time — não atribua nada ao Jardim; só nomeie o treinador se ele estiver no material, senão fale de forma genérica ("o técnico da Seleção"). NUNCA mencione Tite ou técnicos antigos do Flamengo.
+- Ao citar jogadores do FLAMENGO, use APENAS os nomes do elenco listado acima — não invente nem cite quem saiu. Para gente de fora do Fla, só cite quem está NO MATERIAL e não atribua a eles vínculo com o Flamengo que o material não afirme.
+- "Ninho"/"Ninho do Urubu" é o CT onde TODO o elenco treina — dizer que alguém "treina no Ninho" NÃO o torna cria da base. Só chame de "cria do ninho", "cria da base", "moleque/garoto do ninho", "joia da base" ou "revelado pelo Flamengo" quem estiver na lista CRIAS DA BASE acima; para qualquer outro, é PROIBIDO. Em matéria de Seleção ou outro time, não chame companheiros ou adversários de "cria do Ninho". Na dúvida sobre a origem de um jogador, NÃO afirme que ele veio da base do Flamengo.
+
+Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON.
 
 --- MATERIAL JORNALÍSTICO ---
 Título original: {original_title}
 
 Texto completo:
-{full_text[:3000]}
+{full_text[:6000]}
 --- FIM DO MATERIAL ---
 
 Responda com este JSON exato:
@@ -171,7 +179,7 @@ Responda com este JSON exato:
         response = client.models.generate_content(
             model=GEMINI_MODEL_NAME,
             contents=prompt,
-            config={"response_mime_type": "application/json"},
+            config={"response_mime_type": "application/json", "temperature": 0.7},
         )
         article = json.loads(response.text)
         return article, source_name, source_url, original_title

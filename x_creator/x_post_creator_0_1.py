@@ -108,6 +108,18 @@ def read_json_from_git(git_path):
     return json.loads(read_from_git(git_path))
 
 
+def read_json_source(repo_path):
+    """Prefere o arquivo local (fluxo local-first: artigo aprovado nesta máquina,
+    ainda não commitado/pushado pro main). Só faz fallback para o origin/main via
+    git quando o arquivo não existe no disco — mantendo o comportamento de CI,
+    onde o working tree já é o próprio main."""
+    local_path = os.path.join(os.path.dirname(SCRIPT_DIR), repo_path)
+    if os.path.exists(local_path):
+        with open(local_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return read_json_from_git(repo_path)
+
+
 # ── Capa ─────────────────────────────────────────────────────────────────────
 
 def find_cover(slug):
@@ -333,7 +345,7 @@ def process_article(entry, posted):
 
     # Tweet ainda não existe — gera agora
     try:
-        article_json = read_json_from_git(f"article_writer/generated_articles/{file_}")
+        article_json = read_json_source(f"article_writer/generated_articles/{file_}")
     except IOError as e:
         print(f"  [Erro] {e}")
         return None
@@ -401,7 +413,7 @@ def main():
     print("--- Criador de Posts para o X ---\n")
 
     try:
-        approved = read_json_from_git("site_builder/approved.json")
+        approved = read_json_source("site_builder/approved.json")
     except IOError as e:
         print(f"[Erro] {e}")
         return

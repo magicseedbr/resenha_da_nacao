@@ -1,6 +1,6 @@
 # Resenha da Nação — News Curator
 
-Site automatizado de notícias sobre o Flamengo. O pipeline extrai notícias de portais, mede relevância social via tweets, seleciona a melhor história com Gemini AI, gera um artigo original por um dos 3 jornalistas fictícios e (etapa futura) publica no site.
+Site automatizado de notícias sobre o Flamengo. O pipeline extrai notícias de portais, mede relevância social via tweets, seleciona a melhor história com Gemini AI, gera um artigo original por um dos 5 jornalistas fictícios e (etapa futura) publica no site.
 
 ## Estrutura do Projeto
 
@@ -25,9 +25,11 @@ resenha_da_nacao/
 │   └── downloaded_images/              # Imagens baixadas
 ├── article_writer/          # Etapa 4: Geração do artigo original com Gemini
 │   ├── personas/
-│   │   ├── rodrigo_marques.md          # Cronista veterano e dramático
-│   │   ├── thiago_vasconcelos.md       # Analista descolado da nova geração
-│   │   └── fernanda_aguiar.md          # Cronista direta e provocadora
+│   │   ├── rodrigo_marques.md          # Cronista veterano com perspectiva histórica
+│   │   ├── thiago_vasconcelos.md       # Analista descolado com leitura tática acessível
+│   │   ├── fernanda_aguiar.md          # Direta e incisiva, veredicto fundamentado
+│   │   ├── bruno_tavares.md            # Analista tático (ex-base), explica o porquê do jogo
+│   │   └── carla_menezes.md            # Repórter de bastidores/mercado, separa fato de rumor
 │   ├── elenco_flamengo.json            # Elenco atual + crias_da_base (mantido por update_crias.py)
 │   ├── glossario_carioca.md            # Guia de sotaque/vocabulário rubro-negro
 │   ├── update_crias.py                 # Detecta via Gemini quem é cria da base e atualiza crias_da_base
@@ -70,7 +72,7 @@ cd ../image_searcher && python image_searcher_0_1.py
 # 6. Atualiza a lista de crias da base (Gemini; só chama a API se o elenco mudou)
 cd ../article_writer && python update_crias.py
 
-# 6b. Gera artigo original por um dos 3 jornalistas fictícios
+# 6b. Gera artigo original por um dos 5 jornalistas fictícios
 python article_writer_0_1.py
 
 # 7. Revisa e aprova artigos para publicação (etapa manual)
@@ -90,6 +92,15 @@ python instagram_publish_0_1.py
 ```
 
 ## Lógica Principal
+
+### Apenas notícias do dia corrente
+O pipeline trabalha **só com notícias publicadas no dia em que roda**:
+- **Coluna do Fla** (`news_extractor_0_3.py`): filtra os entries do RSS por `published_parsed` (helper `is_published_today`) e para a varredura cedo ao passar do dia (o RSS é reverso-cronológico).
+- **Globo Esporte** (`news_extractor_globo_0_3.py`): extrai a data **real** da matéria (`extract_published_date`: meta `article:published_time` → `datePublished` → `<time datetime>`) e grava em `published_at`. Regra **rigorosa**: sem data confirmada ou data ≠ hoje, o artigo é descartado.
+- **Curador** (`news_extractor_curator_0_1.py`): como `raw_news/` acumula arquivos, o curador só considera itens com `extracted_at` de hoje (helper `is_extracted_today`), garantindo o dia corrente mesmo com sobras de dias anteriores.
+
+### Não repetir notícias curadas
+O curador grava a URL de cada vencedora em `news_curator/used_stories.json` e exclui essas URLs nas próximas execuções (dedup por `source_url`). As candidatas que perderam não são marcadas — só a notícia efetivamente curada.
 
 ### Hype Score (news_curator)
 Mede relevância social cruzando palavras-chave do título da notícia com o corpo dos tweets coletados. Notícias com mais palavras presentes nos tweets ganham score mais alto.
@@ -154,9 +165,13 @@ O `.env` está no `.gitignore` e nunca deve ser commitado. Os scripts que usam G
 
 ## Jornalistas Fictícios (article_writer/personas/)
 
-- **Rodrigo Marques** — cronista veterano e dramático, referências históricas, tom épico
-- **Thiago Vasconcelos** — analista jovem e descolado, linguagem de internet, memes, ironia
-- **Fernanda Aguiar** — direta e provocadora, frases curtas, cobra sem papas na língua
+Cada persona tem uma voz distinta, mas todas partem da mesma base: **informar primeiro, opinar com base no fato**. A personalidade é o tempero; a informação e a análise são o prato.
+
+- **Rodrigo Marques** — cronista veterano; perspectiva histórica e leitura de longo prazo, crítica fundamentada
+- **Thiago Vasconcelos** — analista jovem e descolado; leitura tática acessível e dados, humor a serviço do argumento
+- **Fernanda Aguiar** — direta e incisiva; síntese e veredicto sempre com o porquê na sequência
+- **Bruno Tavares** — analista tático (ex-categorias de base); explica o *porquê* do jogo (esquema, funções, espaço) de forma acessível
+- **Carla Menezes** — repórter de bastidores e mercado; contexto de negociação/gestão/finanças, rigor em separar fato de rumor
 
 ## Etapas Futuras (a implementar)
 
