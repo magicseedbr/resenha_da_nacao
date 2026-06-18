@@ -180,7 +180,28 @@ def is_logged_in(page):
         return False
 
 
-def post_tweet(page, tweet_text, image_path=None):
+def _add_reply_to_thread(page, reply_text):
+    """Adiciona um segundo tweet (o reply com o link) à mesma thread no compositor."""
+    try:
+        add_btn = page.wait_for_selector('[data-testid="addButton"]', timeout=8_000)
+    except PWTimeout:
+        print("  [Aviso] Botão de thread não encontrado — postando só o hook, sem reply.")
+        return False
+    add_btn.click()
+    _human_delay(0.6, 1.2)
+    try:
+        second = page.wait_for_selector('[data-testid="tweetTextarea_1"]', timeout=8_000)
+    except PWTimeout:
+        print("  [Aviso] Segundo campo da thread não apareceu — postando só o hook.")
+        return False
+    second.click()
+    _human_delay(0.4, 0.8)
+    page.keyboard.type(reply_text, delay=random.randint(25, 55))
+    _human_delay(0.6, 1.2)
+    return True
+
+
+def post_tweet(page, tweet_text, image_path=None, reply_text=None):
     page.goto("https://x.com/home", wait_until="domcontentloaded", timeout=20_000)
     _human_delay(2.0, 3.0)
 
@@ -208,6 +229,10 @@ def post_tweet(page, tweet_text, image_path=None):
         finally:
             if tmp_created:
                 os.unlink(jpeg_path)
+
+    if reply_text:
+        if _add_reply_to_thread(page, reply_text):
+            print("  Reply com link adicionado à thread.")
 
     _human_delay(0.5, 1.0)
 
@@ -285,6 +310,12 @@ def main():
                 with open(tweet_file) as f:
                     tweet_text = f.read().strip()
 
+                reply_text = None
+                reply_file = os.path.join(post_dir, "reply.txt")
+                if os.path.exists(reply_file):
+                    with open(reply_file) as f:
+                        reply_text = f.read().strip() or None
+
                 post_data = {}
                 pd_path = os.path.join(post_dir, "post_data.json")
                 if os.path.exists(pd_path):
@@ -296,7 +327,7 @@ def main():
                 print(f"   Imagem: {os.path.basename(image_path) if image_path else '[nenhuma]'}")
 
                 try:
-                    ok = post_tweet(page, tweet_text, image_path)
+                    ok = post_tweet(page, tweet_text, image_path, reply_text)
                 except Exception as err:
                     print(f"   [Erro] {err}\n")
                     continue

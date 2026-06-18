@@ -1,16 +1,18 @@
 """
 Gerador de posts para o X (Twitter) — Resenha da Nação.
 
-Para cada artigo aprovado ainda não postado, gera um tweet com:
-  - Texto de até ~240 chars no estilo do jornalista
-  - Link direto para o artigo no site
-  - Hashtags rubro-negras
+Estratégia (conta de torcida): o alcance no X morre quando o post manda a
+pessoa pra fora da plataforma ou parece automatizado. Por isso cada post agora
+é uma THREAD de 2 tweets:
+  1. tweet.txt  — hook com tensão/opinião/provocação que termina puxando reply.
+                  SEM link e SEM hashtags (engajamento distribui, hashtag não).
+  2. reply.txt  — primeiro reply, só com o link do artigo (o tráfego vai por aqui).
 
-Limite do X: 280 chars. URLs são sempre 23 chars (t.co).
-Texto + hashtags ficam em até 255 chars; o script completa com a URL.
+Limite do X: 280 chars por tweet. Como o link saiu do tweet principal, o hook
+tem os 280 chars inteiros disponíveis.
 
-Saída: x_posts/<slug>/tweet.txt
-Histórico: x_posts/published_x.json
+Saída: x_posts/<slug>/{tweet.txt, reply.txt, image.*, post_data.json}
+Histórico: x_posts/published_x_posted.json
 """
 
 import os
@@ -33,19 +35,9 @@ COVERS_DIR     = os.path.abspath(os.path.join(SCRIPT_DIR, "../site_builder/stati
 GEMINI_MODEL_NAME = "gemini-2.5-flash"
 GROQ_MODEL_NAME   = "llama-3.3-70b-versatile"
 
-# No X, URLs são sempre encurtadas para 23 chars pelo t.co
-_URL_COST = 23
 _MAX_TWEET = 280
-
-HASHTAGS_BASE = "#Flamengo #Mengao #VaiFlamengo"
-
-HASHTAGS_BY_EDITORIA = {
-    "mercado":    "#MercadoDaBola #Transferencias",
-    "base":       "#CriasDoNinho #GeracaoFlamengo",
-    "selecao":    "#Selecao #CopaDoMundo",
-    "bastidores": "#Bastidores",
-    "geral":      "",
-}
+# Margem de segurança para o hook (o modelo às vezes estoura a contagem)
+_HOOK_BUDGET = 270
 
 PERSONA_FILENAME_MAP = {
     "Rodrigo Marques":    "rodrigo_marques.md",
@@ -134,11 +126,6 @@ def load_persona(author):
 
 # ── Geração do tweet ──────────────────────────────────────────────────────────
 
-def build_hashtags(editoria):
-    extra = HASHTAGS_BY_EDITORIA.get(editoria, "")
-    return f"{HASHTAGS_BASE} {extra}".strip() if extra else HASHTAGS_BASE
-
-
 def article_url(slug):
     base = SITE_BASE_URL or "https://www.resenhadanacao.com.br"
     # Garante www. no domínio para o X exibir o subdomínio
@@ -147,14 +134,10 @@ def article_url(slug):
     return f"{base}/artigo/{slug}.html"
 
 
-def _build_prompt(article_data, persona_content, editoria, slug):
+def _build_prompt(article_data, persona_content):
     title    = article_data.get("title", "")
     subtitle = article_data.get("subtitle", "")
     body     = article_data.get("body", "")
-    hashtags = build_hashtags(editoria)
-
-    # O link ocupa 23 chars fixos + "\n" = 24. Texto + hashtags: até 255 chars.
-    max_text_chars = _MAX_TWEET - _URL_COST - 1  # 256
 
     return f"""Você é o(a) jornalista abaixo. Incorpore completamente o estilo descrito.
 
@@ -162,17 +145,30 @@ def _build_prompt(article_data, persona_content, editoria, slug):
 {persona_content}
 --- FIM DO PERFIL ---
 
-Escreva um POST PARA O X (Twitter) sobre o artigo abaixo, para o perfil @ResenhadaNacao.
+Escreva o tweet de ABERTURA de uma thread sobre o artigo abaixo, para o perfil
+@ResenhadaNacao — uma página de TORCIDA do Flamengo. O objetivo NÃO é informar:
+é fazer o torcedor PARAR o scroll e RESPONDER. No X de 2026, engajamento (reply)
+distribui o post; comunicado não alcança ninguém.
 
-REGRAS:
-- Tom nativo do X: direto, rápido, pode ser provocador ou empolgado — sem enrolação
-- Até 1 emoji no máximo (pode ter zero; sem excesso de emojis)
-- Inclua os hashtags abaixo ao final do texto
-- NÃO inclua o link (ele será adicionado automaticamente)
-- LIMITE TOTAL: {max_text_chars} caracteres (texto + hashtags juntos)
-- Conte os caracteres antes de responder e respeite o limite
-- Use linguagem brasileira informal com sotaque carioca
-- Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON
+COMO ESCREVER O HOOK (siga à risca):
+- Comece com TENSÃO ou uma OPINIÃO forte e divisível — algo que rubro-negro defende
+  e torcedor de rival vem brigar. Nada de "Nossos guerreiros honrando a Nação".
+- Munição pra discussão: comparação com rival, alguém ignorado/subestimado,
+  ranking polêmico, provocação, indignação. Identidade e briga, não anúncio.
+- TERMINE com uma pergunta curta que puxe reply ("Concorda?", "Tô exagerando?",
+  "Quem discorda?", "Cadê?"). A pergunta é obrigatória.
+- Pode usar quebras de linha curtas pra dar ritmo (estilo nativo do X).
+
+PROIBIDO:
+- NÃO inclua link (ele vai num reply separado, automático).
+- NÃO use NENHUMA hashtag.
+- NÃO faça frase de aquecimento genérica nem o mesmo padrão de sempre.
+- No máximo 1 emoji (zero é ótimo).
+
+FORMATO:
+- LIMITE: {_HOOK_BUDGET} caracteres. Conte antes de responder e respeite.
+- Português brasileiro informal, sotaque carioca, tom da persona acima.
+- Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON.
 
 --- ARTIGO ---
 Título: {title}
@@ -182,12 +178,9 @@ Corpo (trecho):
 {body[:1500]}
 --- FIM DO ARTIGO ---
 
-Hashtags a incluir ao final:
-{hashtags}
-
 JSON esperado:
 {{
-    "tweet": "<texto completo com hashtags, SEM o link, dentro de {max_text_chars} chars>"
+    "tweet": "<hook com tensão, terminando em pergunta, SEM link, SEM hashtag, até {_HOOK_BUDGET} chars>"
 }}
 """
 
@@ -216,8 +209,8 @@ def _generate_via_groq(prompt):
     return json.loads(response.choices[0].message.content).get("tweet", "")
 
 
-def generate_tweet_text(article_data, persona_content, editoria, slug):
-    prompt = _build_prompt(article_data, persona_content, editoria, slug)
+def generate_tweet_text(article_data, persona_content):
+    prompt = _build_prompt(article_data, persona_content)
 
     try:
         text = _generate_via_gemini(prompt)
@@ -239,21 +232,18 @@ def generate_tweet_text(article_data, persona_content, editoria, slug):
         return ""
 
 
-def assemble_tweet(tweet_text, slug):
-    """Monta o tweet final: texto + quebra de linha + URL."""
-    url = article_url(slug)
-    full = f"{tweet_text}\n{url}"
+def clean_hook(tweet_text):
+    """Garante que o hook caiba em 280 chars (sem link/hashtag por construção)."""
+    text = tweet_text.strip()
+    if len(text) > _MAX_TWEET:
+        print(f"  [Aviso] Hook longo demais ({len(text)} chars). Truncando.")
+        text = text[:_MAX_TWEET].rstrip()
+    return text, len(text)
 
-    # Calcula tamanho real: texto + "\n" + 23 (t.co) em vez do URL literal
-    real_len = len(tweet_text) + 1 + _URL_COST
-    if real_len > _MAX_TWEET:
-        print(f"  [Aviso] Tweet longo demais ({real_len} chars). Truncando texto.")
-        # Trunca o texto para caber; mantém hashtags se possível
-        budget = _MAX_TWEET - _URL_COST - 1  # 256
-        tweet_text = tweet_text[:budget].rstrip()
-        full = f"{tweet_text}\n{url}"
 
-    return full, real_len
+def build_reply(slug):
+    """Primeiro reply da thread: só o link (é por aqui que vai o tráfego)."""
+    return f"Resenha completa aqui 👇\n{article_url(slug)}"
 
 
 # ── Processamento por artigo ──────────────────────────────────────────────────
@@ -305,19 +295,23 @@ def process_article(entry, posted):
         print(f"  [Aviso] Persona de '{author}' não encontrada.")
 
     print(f"  Jornalista: {author}")
-    print("  Gerando tweet...")
-    tweet_text = generate_tweet_text(article_data, persona_content, editoria, slug)
+    print("  Gerando hook...")
+    tweet_text = generate_tweet_text(article_data, persona_content)
 
     if not tweet_text:
         print("  [Erro] Falha ao gerar tweet.")
         return None
 
-    full_tweet, char_count = assemble_tweet(tweet_text, slug)
+    hook, char_count = clean_hook(tweet_text)
+    reply_text       = build_reply(slug)
 
     os.makedirs(post_dir, exist_ok=True)
 
     with open(tweet_file, "w", encoding="utf-8") as f:
-        f.write(full_tweet)
+        f.write(hook)
+
+    with open(os.path.join(post_dir, "reply.txt"), "w", encoding="utf-8") as f:
+        f.write(reply_text)
 
     if cover_src:
         shutil.copy2(cover_src, os.path.join(post_dir, f"image.{cover_ext}"))
@@ -330,13 +324,14 @@ def process_article(entry, posted):
         "article_title": article_data.get("title", ""),
         "tweet_chars":   char_count,
         "url":           article_url(slug),
+        "reply":         reply_text,
         "has_cover":     cover_src is not None,
     }
     with open(os.path.join(post_dir, "post_data.json"), "w", encoding="utf-8") as f:
         json.dump(post_data, f, ensure_ascii=False, indent=4)
 
     img_info = f"image.{cover_ext}" if cover_src else "sem imagem"
-    print(f"  [OK] Salvo em x_posts/{dirname}/  ({char_count}/280 chars, {img_info})")
+    print(f"  [OK] Salvo em x_posts/{dirname}/  (hook {char_count}/280 chars, + reply c/ link, {img_info})")
     return dirname
 
 
