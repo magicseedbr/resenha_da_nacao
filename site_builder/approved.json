@@ -257,5 +257,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-18T10:45:00.000000",
         "cover": "static/covers/danilo-cala-criticos-e-mostra-a-que-veio-e-fla-na-selecao-e-ponto-final.webp"
+    },
+    {
+        "file": "article_20260608_221602.json",
+        "slug": "filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro",
+        "editoria": "bastidores",
+        "approved_at": "2026-06-18T18:36:49.103966",
+        "cover": "static/covers/filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro.jpg"
     }
 ]
