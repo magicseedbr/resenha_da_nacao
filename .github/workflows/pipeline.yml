@@ -119,27 +119,3 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -m "X: registra posts publicados e limpa fila"
           git push
-
-      - name: Gerar comentários nos perfis-alvo (comentador)
-        timeout-minutes: 5
-        continue-on-error: true
-        env:
-          X_SESSION_JSON: ${{ secrets.X_SESSION_JSON }}
-        run: python -u x_commenter/x_comment_creator_0_1.py
-
-      - name: Postar comentários no X
-        timeout-minutes: 6
-        continue-on-error: true
-        env:
-          X_SESSION_JSON: ${{ secrets.X_SESSION_JSON }}
-        run: python -u x_commenter/x_comment_publisher_0_1.py
-
-      - name: Salvar registro de comentários publicados
-        timeout-minutes: 2
-        continue-on-error: true
-        run: |
-          git pull --rebase --autostash origin main || true
-          git add x_commenter/published_comments.json || true
-          git diff --cached --quiet && exit 0
-          git commit -m "Comentador: registra comentários publicados"
-          git push
