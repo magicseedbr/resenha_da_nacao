@@ -1,6 +1,9 @@
 # Segredos — nunca commitar
 .env
 
+# Sessão de login do X (cookies/auth_token) — só usada localmente; no CI vem do secret X_SESSION_JSON
+x_creator/x_session.json
+
 # Ambiente virtual Python
 venv/
 
@@ -13,3 +16,6 @@ __pycache__/
 
 # Site gerado (build feito pelo GitHub Actions a partir das fontes)
 site_builder/output/
+
+# Backup local do reset (checklist de remoção manual nas redes — não versionar)
+reset_backup/

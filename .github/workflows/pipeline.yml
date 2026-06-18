@@ -1,9 +1,9 @@
 name: Pipeline automático — Resenha da Nação
 
 on:
-  schedule:
-    # 4x/dia: 06:23, 10:23, 15:23 e 19:23 BRT (BRT = UTC-3)
-    - cron: '23 9,13,18,22 * * *'
+  # Automação desativada (reset do portal). O agendamento 4x/dia foi removido;
+  # o pipeline só roda por disparo manual no painel do GitHub. Para religar a
+  # automação, readicione o bloco `schedule:` com o cron '23 9,13,18,22 * * *'.
   workflow_dispatch:       # disparo manual pelo painel do GitHub
 
 permissions:
