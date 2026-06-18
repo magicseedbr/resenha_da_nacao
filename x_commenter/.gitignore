@@ -1,0 +1,8 @@
+# Estado de runtime do comentador (não versionar)
+comments/
+pending_comments.json
+debug_*.png
+__pycache__/
+
+# published_comments.json É versionado (dedup entre execuções do pipeline)
+!published_comments.json

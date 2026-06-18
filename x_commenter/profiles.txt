@@ -1,0 +1,11 @@
+# Perfis-alvo do comentador — Resenha da Nação
+# Um @ por linha (com ou sem o "@"). Linhas começando com # são ignoradas.
+# O processo pega o post mais recente de cada perfil (ignora fixados e reposts)
+# e gera um comentário de curiosidade pra revisão.
+#
+# Exemplo:
+# ge
+# venecasagrande
+# flamengo
+
+@ColunadoFla
