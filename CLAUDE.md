@@ -91,6 +91,18 @@ cd ../instagram_creator && python instagram_post_creator_0_1.py
 python instagram_publish_0_1.py
 ```
 
+### Rotina consolidada (`routine.py`)
+`routine.py` (na raiz) encapsula o fluxo diário em 4 fases: **criar** (extrai notícias do dia + cura + gera o artigo), **site** (auto_approve + capa + build + commit/push no main → deploy do GitHub Pages, esperando o artigo subir), **xpost** (gera o post do X) e **comentarios** (gera comentários nos perfis-alvo). As fases que postam no X **só geram e exibem** o conteúdo por padrão; publicam de fato apenas com `--publish` (mantém a publicação supervisionada). Para publicar o post usa o `x_ci_publisher` (headless, sem gate), gerando o `X_SESSION_JSON` a partir do `x_creator/x_session.json` local.
+
+```bash
+python routine.py                       # tudo, sem postar no X (gera/exibe para revisão)
+python routine.py criar site            # cria o artigo e publica no site (com deploy)
+python routine.py xpost --publish       # gera e publica o post do X
+python routine.py comentarios --keep geglobo,Brasileirao --publish   # publica só os perfis curados
+python routine.py tudo --publish        # fluxo completo postando no X
+python routine.py site --no-deploy      # gera o site local, sem push no main
+```
+
 ## Lógica Principal
 
 ### Apenas notícias do dia corrente

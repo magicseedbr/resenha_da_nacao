@@ -287,6 +287,10 @@ def commented_post_urls():
             published = json.load(f)
     except (json.JSONDecodeError, IOError):
         return set()
+    # Tolera formato legado (lista) ou arquivo vazio inicializado como []: sem
+    # registros de URL, então nada a deduplicar.
+    if not isinstance(published, dict):
+        return set()
     urls = set()
     for key, val in published.items():
         if "/status/" in key:

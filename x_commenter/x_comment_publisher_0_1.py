@@ -175,6 +175,9 @@ def main():
         return
 
     published = load_json(PUBLISHED_FILE, {})
+    # Tolera formato legado (lista) ou vazio inicializado como []: normaliza p/ dict.
+    if not isinstance(published, dict):
+        published = {}
     done_urls = {v["post_url"] for v in published.values()
                  if isinstance(v, dict) and v.get("post_url")} | \
                 {k for k in published if "/status/" in k}
