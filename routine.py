@@ -150,6 +150,11 @@ def wait_for_deploy(slug, timeout=300):
 
 # ── Fases ────────────────────────────────────────────────────────────────────────
 
+def _generated_files():
+    d = os.path.join(ARTICLE_WRITER, "generated_articles")
+    return set(os.listdir(d)) if os.path.isdir(d) else set()
+
+
 def fase_criar():
     banner("FASE 1/4 — Criação do artigo")
     run("Extrai Coluna do Fla (RSS, só hoje)", ["news_extractor_0_3.py"], cwd=NEWS_EXTRACTOR)
@@ -157,7 +162,17 @@ def fase_criar():
     run("Coleta tweets", ["news_extractor_x_0_1.py"], cwd=NEWS_EXTRACTOR)
     run("Curadoria (Hype Score + Gemini)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
     run("Atualiza crias da base", ["update_crias.py"], cwd=ARTICLE_WRITER)
+
+    # O article_writer sai com código 0 mesmo se a API falhar (ex.: quota). Detectamos
+    # a falha pela ausência de um arquivo novo em generated_articles/ e paramos a rotina,
+    # para não deployar/postar sem artigo novo.
+    antes = _generated_files()
     run("Gera artigo original", ["article_writer_0_1.py"], cwd=ARTICLE_WRITER)
+    novos = _generated_files() - antes
+    if not novos:
+        raise SystemExit("[Rotina] Nenhum artigo novo foi gerado (provável quota de API esgotada). "
+                         "Interrompendo antes do deploy/post.")
+    print(f"\n[Rotina] Artigo novo gerado: {sorted(novos)[0]}")
 
 
 def fase_site(deploy=True):
@@ -265,6 +280,12 @@ def fase_comentarios(publish=False, keep=None):
 # ── Main ─────────────────────────────────────────────────────────────────────────
 
 def main():
+    # Linha-a-linha: mantém a ordem dos logs do orquestrador e dos subprocessos.
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except (AttributeError, ValueError):
+        pass
+
     parser = argparse.ArgumentParser(
         description="Rotina Resenha da Nação (criar -> site -> xpost -> comentarios).",
         formatter_class=argparse.RawDescriptionHelpFormatter,
