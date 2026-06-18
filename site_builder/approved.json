@@ -250,5 +250,12 @@
         "editoria": "bastidores",
         "approved_at": "2026-06-18T12:00:05.000000",
         "cover": "static/covers/filipe-luis-demitido-apos-goleada-sobre-o-madureira.jpg"
+    },
+    {
+        "file": "article_20260618_104331.json",
+        "slug": "danilo-cala-criticos-e-mostra-a-que-veio-e-fla-na-selecao-e-ponto-final",
+        "editoria": "selecao",
+        "approved_at": "2026-06-18T10:45:00.000000",
+        "cover": "static/covers/danilo-cala-criticos-e-mostra-a-que-veio-e-fla-na-selecao-e-ponto-final.webp"
     }
 ]
