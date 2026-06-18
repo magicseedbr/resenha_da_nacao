@@ -130,6 +130,10 @@ CRIAS DA BASE (jogadores formados nas categorias de base do Flamengo):
 Agora, com base no material jornalístico abaixo, escreva um artigo original de 400 a 600 palavras para o portal Resenha da Nação.
 
 REGRAS:
+- **REGRA DE OURO — FATOS (acima de qualquer outra):** Escreva APENAS com base nos fatos presentes no MATERIAL JORNALÍSTICO abaixo. É TERMINANTEMENTE PROIBIDO inventar ou "preencher lacunas" com nomes de clubes, jogadores, técnicos ou dirigentes; valores, propostas ou salários; datas, placares ou números; declarações e aspas; transferências, negociações, recusas ou interesses de outros clubes que NÃO estejam escritos no material. Se o material não diz, você NÃO sabe — não afirme.
+- **Rumor não é fato:** se o material trata algo como possibilidade ou especulação, trate como possibilidade ("pode", "estuda", "especula-se") — NUNCA como certeza consumada. Não dê nome a um "clube interessado" que o material não nomeou.
+- **Opinião sim, invenção não:** tom quente, indignação, provocação e crítica são LIVRES e bem-vindos — mas têm que se apoiar SÓ nos fatos do material. Tenha opinião forte sobre o que aconteceu DE VERDADE; nunca crie um acontecimento pra sustentar a opinião.
+- Na dúvida entre ser específico (com risco de inventar) e ser fiel ao material, seja FIEL ao material, mesmo que o texto fique mais genérico. Credibilidade vale mais que detalhe.
 - Escreva na voz e no estilo EXATO do jornalista descrito no perfil acima
 - Crie um título próprio (não copie o título original)
 - Crie uma linha de apoio (subtitle) curta e impactante
@@ -143,6 +147,7 @@ REGRAS:
 - **IMPORTANTE (Ninho do Urubu):** "Ninho" / "Ninho do Urubu" é o CT onde TODO o elenco treina. Dizer que um jogador "treina/está no Ninho" NÃO o torna cria da base.
 - **IMPORTANTE (Cria do Ninho):** Só chame um jogador de "cria do ninho", "cria da base", "moleque do ninho", "garoto do ninho", "joia da base" ou "revelado pelo Flamengo" se o nome dele estiver na lista CRIAS DA BASE acima. Para QUALQUER outro jogador, é PROIBIDO usar esses termos.
 - **IMPORTANTE:** Na dúvida sobre a origem de um jogador, NÃO afirme que ele veio da base do Flamengo.
+- Jornalismo honesto, não bajulação: se o Fla jogou mal, diga; se a decisão foi errada, aponte; se a contratação foi questionável, questione. Torcedor que ama o clube exige verdade, não jabá
 - Pode ser irreverente, apaixonado, provocador — mas nunca chulo
 - Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON
 

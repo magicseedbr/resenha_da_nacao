@@ -112,13 +112,6 @@
         "cover": "static/covers/danilo-titular-na-copa-o-plot-twist-que-so-o-mengao-consegue-entregar.webp"
     },
     {
-        "file": "article_20260608_221602.json",
-        "slug": "filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro",
-        "editoria": "bastidores",
-        "approved_at": "2026-06-08T22:16:05.089867",
-        "cover": "static/covers/filipe-luis-no-monaco-o-erro-da-gavea-ainda-custa-caro.jpg"
-    },
-    {
         "file": "article_20260609_104907.json",
         "slug": "do-manto-sagrado-a-amarelinha-um-filho-da-nacao-a-servico-do-brasil",
         "editoria": "selecao",
@@ -250,5 +243,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-17T23:57:05.679473",
         "cover": "static/covers/das-trevas-a-luz-a-nacao-e-o-renascer-de-plata-para-o-mundo.jpg"
+    },
+    {
+        "file": "article_20260618_120000.json",
+        "slug": "filipe-luis-demitido-apos-goleada-sobre-o-madureira",
+        "editoria": "bastidores",
+        "approved_at": "2026-06-18T12:00:05.000000",
+        "cover": "static/covers/filipe-luis-demitido-apos-goleada-sobre-o-madureira.jpg"
     }
 ]

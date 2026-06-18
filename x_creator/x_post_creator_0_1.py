@@ -18,6 +18,7 @@ Histórico: x_posts/published_x_posted.json
 import os
 import json
 import shutil
+import hashlib
 import subprocess
 from datetime import datetime
 from google import genai
@@ -38,6 +39,27 @@ GROQ_MODEL_NAME   = "llama-3.3-70b-versatile"
 _MAX_TWEET = 280
 # Margem de segurança para o hook (o modelo às vezes estoura a contagem)
 _HOOK_BUDGET = 270
+
+# Estilos de fechamento do hook — escolhidos de forma determinística por slug
+# para variar entre posts e não saturar (pergunta repetida vira ruído, igual
+# hashtag). Inclui opções SEM pergunta: às vezes a afirmação categórica provoca
+# mais reply, porque o leitor sente que precisa te corrigir.
+HOOK_CLOSERS = [
+    'Feche com uma pergunta curta tipo "concorda?" (NÃO use "quem discorda?", já saturou).',
+    'Feche com uma pergunta tipo "tô errado?" ou "tô viajando?".',
+    'Feche com uma provocação curta tipo "fala aí" ou "quem tá comigo?".',
+    'NÃO faça pergunta nenhuma. Feche com uma AFIRMAÇÃO categórica e polêmica — '
+    'daquelas que fazem o leitor querer te corrigir nos comentários.',
+    'NÃO faça pergunta. Feche com um desafio curto tipo "me prova o contrário".',
+]
+
+# Teasers de reserva (se o modelo não devolver reply_teaser) — também variados.
+FALLBACK_TEASERS = [
+    "Tem um detalhe nessa história que muda tudo — botei tudo aqui 👇",
+    "O que ninguém tá falando sobre isso eu coloquei aqui 👇",
+    "A real, sem filtro, tá na resenha completa 👇",
+    "Expliquei o que tá por trás disso aqui 👇",
+]
 
 PERSONA_FILENAME_MAP = {
     "Rodrigo Marques":    "rodrigo_marques.md",
@@ -134,7 +156,17 @@ def article_url(slug):
     return f"{base}/artigo/{slug}.html"
 
 
-def _build_prompt(article_data, persona_content):
+def _slug_index(slug, n):
+    """Índice determinístico em [0, n) a partir do slug (estável entre runs)."""
+    h = int(hashlib.md5(slug.encode("utf-8")).hexdigest(), 16)
+    return h % n
+
+
+def pick_closer(slug):
+    return HOOK_CLOSERS[_slug_index(slug, len(HOOK_CLOSERS))]
+
+
+def _build_prompt(article_data, persona_content, closer):
     title    = article_data.get("title", "")
     subtitle = article_data.get("subtitle", "")
     body     = article_data.get("body", "")
@@ -145,30 +177,39 @@ def _build_prompt(article_data, persona_content):
 {persona_content}
 --- FIM DO PERFIL ---
 
-Escreva o tweet de ABERTURA de uma thread sobre o artigo abaixo, para o perfil
+Você vai escrever uma THREAD de 2 tweets sobre o artigo abaixo, para o perfil
 @ResenhadaNacao — uma página de TORCIDA do Flamengo. O objetivo NÃO é informar:
 é fazer o torcedor PARAR o scroll e RESPONDER. No X de 2026, engajamento (reply)
 distribui o post; comunicado não alcança ninguém.
 
-COMO ESCREVER O HOOK (siga à risca):
+TWEET 1 — O HOOK (siga à risca):
 - Comece com TENSÃO ou uma OPINIÃO forte e divisível — algo que rubro-negro defende
   e torcedor de rival vem brigar. Nada de "Nossos guerreiros honrando a Nação".
 - Munição pra discussão: comparação com rival, alguém ignorado/subestimado,
   ranking polêmico, provocação, indignação. Identidade e briga, não anúncio.
-- TERMINE com uma pergunta curta que puxe reply ("Concorda?", "Tô exagerando?",
-  "Quem discorda?", "Cadê?"). A pergunta é obrigatória.
+- FECHAMENTO (importante, varia a cada post): {closer}
 - Pode usar quebras de linha curtas pra dar ritmo (estilo nativo do X).
+- LIMITE: {_HOOK_BUDGET} caracteres. Conte antes de responder e respeite.
 
-PROIBIDO:
-- NÃO inclua link (ele vai num reply separado, automático).
+TWEET 2 — O REPLY (o link entra aqui automaticamente, você NÃO escreve o link):
+- Escreva UMA linha de CURIOSIDADE que AUMENTA a tensão e dá motivo pra clicar,
+  SEM entregar a resposta. Pense em "gancho de retenção", não em "aqui está o link".
+- Exemplos de tom: "Tem um detalhe nessa convocação que muda tudo 👇" /
+  "O que ninguém tá falando sobre essa decisão eu botei aqui:".
+- NÃO repita o hook. NÃO escreva "Resenha completa aqui" puro e seco. Máx ~120 chars.
+
+PROIBIDO (nos dois tweets):
+- FATOS: baseie-se SOMENTE no que está escrito no artigo abaixo. NÃO invente nem
+  acrescente clubes, nomes, números, valores, datas, placares ou declarações que
+  não estejam no corpo do artigo. Se não está no artigo, NÃO entra no tweet. A
+  tensão tem que vir de um fato real do artigo, nunca de algo inventado.
+- NÃO inclua link (ele vai no reply automaticamente).
 - NÃO use NENHUMA hashtag.
 - NÃO faça frase de aquecimento genérica nem o mesmo padrão de sempre.
-- No máximo 1 emoji (zero é ótimo).
+- No máximo 1 emoji por tweet (zero é ótimo no hook).
 
-FORMATO:
-- LIMITE: {_HOOK_BUDGET} caracteres. Conte antes de responder e respeite.
-- Português brasileiro informal, sotaque carioca, tom da persona acima.
-- Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON.
+Português brasileiro informal, sotaque carioca, tom da persona acima.
+Responda SOMENTE com JSON válido, sem markdown, sem texto fora do JSON.
 
 --- ARTIGO ---
 Título: {title}
@@ -180,7 +221,8 @@ Corpo (trecho):
 
 JSON esperado:
 {{
-    "tweet": "<hook com tensão, terminando em pergunta, SEM link, SEM hashtag, até {_HOOK_BUDGET} chars>"
+    "tweet": "<hook com tensão, fechamento conforme instruído, SEM link, SEM hashtag, até {_HOOK_BUDGET} chars>",
+    "reply_teaser": "<linha de curiosidade que puxa o clique, SEM o link, SEM hashtag, até ~120 chars>"
 }}
 """
 
@@ -194,7 +236,8 @@ def _generate_via_gemini(prompt):
         contents=prompt,
         config={"response_mime_type": "application/json"},
     )
-    return json.loads(response.text).get("tweet", "")
+    data = json.loads(response.text)
+    return data.get("tweet", ""), data.get("reply_teaser", "")
 
 
 def _generate_via_groq(prompt):
@@ -206,16 +249,18 @@ def _generate_via_groq(prompt):
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
     )
-    return json.loads(response.choices[0].message.content).get("tweet", "")
+    data = json.loads(response.choices[0].message.content)
+    return data.get("tweet", ""), data.get("reply_teaser", "")
 
 
-def generate_tweet_text(article_data, persona_content):
-    prompt = _build_prompt(article_data, persona_content)
+def generate_tweet_text(article_data, persona_content, slug):
+    """Retorna (hook, reply_teaser). reply_teaser pode vir vazio (usa fallback)."""
+    prompt = _build_prompt(article_data, persona_content, pick_closer(slug))
 
     try:
-        text = _generate_via_gemini(prompt)
+        hook, teaser = _generate_via_gemini(prompt)
         print("  (via Gemini)")
-        return text
+        return hook, teaser
     except Exception as err:
         err_str = str(err)
         if "429" in err_str or "quota" in err_str.lower():
@@ -224,12 +269,12 @@ def generate_tweet_text(article_data, persona_content):
             print(f"  [Gemini falhou] {err_str[:120]} — tentando Groq...")
 
     try:
-        text = _generate_via_groq(prompt)
+        hook, teaser = _generate_via_groq(prompt)
         print("  (via Groq fallback)")
-        return text
+        return hook, teaser
     except Exception as err:
         print(f"  [Falha na API] Groq também falhou: {err}")
-        return ""
+        return "", ""
 
 
 def clean_hook(tweet_text):
@@ -241,9 +286,19 @@ def clean_hook(tweet_text):
     return text, len(text)
 
 
-def build_reply(slug):
-    """Primeiro reply da thread: só o link (é por aqui que vai o tráfego)."""
-    return f"Resenha completa aqui 👇\n{article_url(slug)}"
+def build_reply(slug, teaser=""):
+    """Primeiro reply: teaser de curiosidade + link (o tráfego vai por aqui).
+
+    Usa o teaser gerado pelo modelo; se vier vazio, cai num fallback variado por
+    slug. O teaser nunca traz o link — ele é anexado aqui.
+    """
+    teaser = (teaser or "").strip()
+    if not teaser:
+        teaser = FALLBACK_TEASERS[_slug_index(slug, len(FALLBACK_TEASERS))]
+    # Cap defensivo: deixa folga pro link (t.co = 23) dentro dos 280
+    if len(teaser) > 240:
+        teaser = teaser[:240].rstrip()
+    return f"{teaser}\n{article_url(slug)}"
 
 
 # ── Processamento por artigo ──────────────────────────────────────────────────
@@ -295,15 +350,15 @@ def process_article(entry, posted):
         print(f"  [Aviso] Persona de '{author}' não encontrada.")
 
     print(f"  Jornalista: {author}")
-    print("  Gerando hook...")
-    tweet_text = generate_tweet_text(article_data, persona_content)
+    print("  Gerando hook + reply...")
+    tweet_text, reply_teaser = generate_tweet_text(article_data, persona_content, slug)
 
     if not tweet_text:
         print("  [Erro] Falha ao gerar tweet.")
         return None
 
     hook, char_count = clean_hook(tweet_text)
-    reply_text       = build_reply(slug)
+    reply_text       = build_reply(slug, reply_teaser)
 
     os.makedirs(post_dir, exist_ok=True)
 
