@@ -19,5 +19,12 @@
         "editoria": "base",
         "approved_at": "2026-06-19T09:27:49.508817",
         "cover": "static/covers/filipe-luis-da-gavea-ao-principado-a-gestao-de-um-idolo-no-banco-europeu.webp"
+    },
+    {
+        "file": "article_20260619_093537.json",
+        "slug": "a-nacao-fez-a-diferenca-como-a-torcida-escalou-diego-alves-no-fla",
+        "editoria": "mercado",
+        "approved_at": "2026-06-19T09:36:26.670011",
+        "cover": "static/covers/a-nacao-fez-a-diferenca-como-a-torcida-escalou-diego-alves-no-fla.webp"
     }
 ]
