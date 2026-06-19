@@ -4,6 +4,7 @@ import glob
 import random
 from datetime import datetime
 from google import genai
+from groq import Groq
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -24,10 +25,12 @@ PERSONAS_DIR = os.path.join(SCRIPT_DIR, "personas")
 GLOSSARY_FILE = os.path.join(SCRIPT_DIR, "glossario_carioca.md")
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "generated_articles")
 GEMINI_MODEL_NAME = "gemini-2.5-flash"
+GROQ_MODEL_NAME = "llama-3.3-70b-versatile"
 
 # API Key carregada do arquivo .env na raiz do projeto (um nível acima deste script)
 load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
@@ -84,11 +87,54 @@ def load_elenco():
         return {}
 
 
-def generate_article(story_data, persona, glossary="", elenco=None):
-    if not GEMINI_API_KEY:
-        raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY no arquivo .env da raiz do projeto.")
-
+def _via_gemini(prompt):
+    """Gera o JSON do artigo via Gemini. Retorna o texto (JSON) bruto."""
     client = genai.Client(api_key=GEMINI_API_KEY)
+    response = client.models.generate_content(
+        model=GEMINI_MODEL_NAME,
+        contents=prompt,
+        config={"response_mime_type": "application/json", "temperature": 0.7},
+    )
+    return response.text
+
+
+def _via_groq(prompt):
+    """Fallback: gera o JSON do artigo via Groq (llama-3.3). Retorna o texto bruto."""
+    client = Groq(api_key=GROQ_API_KEY)
+    resp = client.chat.completions.create(
+        model=GROQ_MODEL_NAME,
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
+        temperature=0.7,
+    )
+    return resp.choices[0].message.content
+
+
+def _generate_json(prompt):
+    """Tenta Gemini; se falhar (ex.: quota 429), cai para o Groq. Retorna texto JSON ou None."""
+    try:
+        text = _via_gemini(prompt)
+        print(" (via Gemini)")
+        return text
+    except Exception as err:
+        es = str(err)
+        tag = "[Gemini 429]" if ("429" in es or "quota" in es.lower()) else "[Gemini falhou]"
+        print(f" {tag} {es[:90]} — tentando Groq...")
+        if not GROQ_API_KEY:
+            print(" [Falha] GROQ_API_KEY não definida no .env — sem fallback.")
+            return None
+        try:
+            text = _via_groq(prompt)
+            print(" (via Groq fallback)")
+            return text
+        except Exception as err2:
+            print(f" [Falha] Groq também falhou: {err2}")
+            return None
+
+
+def generate_article(story_data, persona, glossary="", elenco=None):
+    if not GEMINI_API_KEY and not GROQ_API_KEY:
+        raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY (e/ou GROQ_API_KEY) no .env da raiz do projeto.")
 
     article_data = story_data.get("article_data", {})
     original_title = article_data.get("title", "")
@@ -175,16 +221,14 @@ Responda com este JSON exato:
 }}
 """
 
+    raw = _generate_json(prompt)
+    if raw is None:
+        return None, source_name, source_url, original_title
     try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL_NAME,
-            contents=prompt,
-            config={"response_mime_type": "application/json", "temperature": 0.7},
-        )
-        article = json.loads(response.text)
+        article = json.loads(raw)
         return article, source_name, source_url, original_title
-    except Exception as err:
-        print(f"[Falha na API] Erro durante geração com Gemini: {err}")
+    except json.JSONDecodeError as err:
+        print(f"[Falha] Resposta da API não é JSON válido: {err}")
         return None, source_name, source_url, original_title
 
 
