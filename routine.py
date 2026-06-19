@@ -160,21 +160,26 @@ def fase_criar():
     run("Extrai Coluna do Fla (RSS, só hoje)", ["news_extractor_0_3.py"], cwd=NEWS_EXTRACTOR)
     run("Extrai Globo Esporte (só hoje)", ["news_extractor_globo_0_3.py"], cwd=NEWS_EXTRACTOR)
     run("Coleta tweets", ["news_extractor_x_0_1.py"], cwd=NEWS_EXTRACTOR)
-    run("Curadoria (Hype Score + Gemini)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
-
-    # A curadoria só reescreve selected_story.json quando há notícia NOVA do dia.
-    # Se não houver, ela sai sem atualizar e o article_writer geraria uma DUPLICATA a
-    # partir do selected_story.json antigo. Conferimos a data da curadoria e paramos.
+    # A curadoria só reescreve selected_story.json quando seleciona uma notícia NOVA
+    # (ela já exclui do pool o que está em used_stories e o que não é do dia). Se não
+    # houver notícia inédita, ela sai SEM atualizar o arquivo, e o article_writer
+    # geraria uma DUPLICATA a partir do story anterior. Comparamos o curated_at antes
+    # e depois: se não mudou, nada novo foi escolhido -> interrompe.
     sel = os.path.join(NEWS_CURATOR, "selected_story.json")
-    try:
-        with open(sel, encoding="utf-8") as f:
-            curated_at = json.load(f).get("curated_at", "")
-    except (json.JSONDecodeError, IOError):
-        curated_at = ""
-    if curated_at[:10] != time.strftime("%Y-%m-%d"):
-        raise SystemExit("[Rotina] A curadoria não selecionou notícia nova de hoje "
-                         f"(selected_story.json de {curated_at[:10] or '?'}). Nada novo a publicar "
-                         "— interrompendo para não gerar/deployar duplicata.")
+
+    def _curated_at():
+        try:
+            with open(sel, encoding="utf-8") as f:
+                return json.load(f).get("curated_at", "")
+        except (json.JSONDecodeError, IOError, FileNotFoundError):
+            return ""
+
+    antes_cur = _curated_at()
+    run("Curadoria (Hype Score + Gemini)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
+    if _curated_at() == antes_cur:
+        raise SystemExit("[Rotina] A curadoria não selecionou notícia nova (selected_story.json "
+                         "inalterado — provável ausência de notícia inédita do dia). Interrompendo "
+                         "para não gerar/deployar duplicata.")
 
     run("Atualiza crias da base", ["update_crias.py"], cwd=ARTICLE_WRITER)
 
