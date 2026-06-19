@@ -161,6 +161,21 @@ def fase_criar():
     run("Extrai Globo Esporte (só hoje)", ["news_extractor_globo_0_3.py"], cwd=NEWS_EXTRACTOR)
     run("Coleta tweets", ["news_extractor_x_0_1.py"], cwd=NEWS_EXTRACTOR)
     run("Curadoria (Hype Score + Gemini)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
+
+    # A curadoria só reescreve selected_story.json quando há notícia NOVA do dia.
+    # Se não houver, ela sai sem atualizar e o article_writer geraria uma DUPLICATA a
+    # partir do selected_story.json antigo. Conferimos a data da curadoria e paramos.
+    sel = os.path.join(NEWS_CURATOR, "selected_story.json")
+    try:
+        with open(sel, encoding="utf-8") as f:
+            curated_at = json.load(f).get("curated_at", "")
+    except (json.JSONDecodeError, IOError):
+        curated_at = ""
+    if curated_at[:10] != time.strftime("%Y-%m-%d"):
+        raise SystemExit("[Rotina] A curadoria não selecionou notícia nova de hoje "
+                         f"(selected_story.json de {curated_at[:10] or '?'}). Nada novo a publicar "
+                         "— interrompendo para não gerar/deployar duplicata.")
+
     run("Atualiza crias da base", ["update_crias.py"], cwd=ARTICLE_WRITER)
 
     # O article_writer sai com código 0 mesmo se a API falhar (ex.: quota). Detectamos
