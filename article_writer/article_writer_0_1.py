@@ -232,6 +232,25 @@ Responda com este JSON exato:
         return None, source_name, source_url, original_title
 
 
+def choose_balanced_persona(personas):
+    """Escolhe o jornalista que MENOS escreveu até agora (balanceamento por autoria),
+    com desempate aleatório. Conta a autoria nos artigos de generated_articles/. Evita
+    a concentração que o random.choice puro causa quando há poucos artigos."""
+    counts = {p["name"]: 0 for p in personas}
+    for path in glob.glob(os.path.join(OUTPUT_DIR, "*.json")):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                author = json.load(f).get("author", "")
+        except (json.JSONDecodeError, IOError):
+            continue
+        if author in counts:
+            counts[author] += 1
+    menor = min(counts.values())
+    candidatos = [p for p in personas if counts[p["name"]] == menor]
+    print(f" Balanceamento de autoria: {counts}")
+    return random.choice(candidatos)
+
+
 def main():
     print("--- Iniciando Gerador de Artigos ---")
 
@@ -247,7 +266,7 @@ def main():
     glossary = load_glossary()
     elenco = load_elenco()
 
-    chosen_persona = random.choice(personas)
+    chosen_persona = choose_balanced_persona(personas)
     print(f" Jornalista selecionado(a): {chosen_persona['name']}")
     print(f" Glossário carioca: {'carregado' if glossary else 'ausente'}")
     print(f" Elenco Flamengo: {'carregado' if elenco else 'ausente'}")

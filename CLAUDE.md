@@ -33,7 +33,7 @@ resenha_da_nacao/
 │   ├── elenco_flamengo.json            # Elenco atual + crias_da_base (mantido por update_crias.py)
 │   ├── glossario_carioca.md            # Guia de sotaque/vocabulário rubro-negro
 │   ├── update_crias.py                 # Detecta via Gemini quem é cria da base e atualiza crias_da_base
-│   ├── article_writer_0_1.py           # Seleciona jornalista aleatório e gera artigo
+│   ├── article_writer_0_1.py           # Seleciona o jornalista que menos escreveu (balanceado) e gera artigo
 │   └── generated_articles/             # JSONs dos artigos gerados
 ├── site_builder/            # Etapa 5: Publicação — gera o site estático rubro-negro
 │   ├── shared.py                       # Utils: slug, editoria por palavra-chave, personas
