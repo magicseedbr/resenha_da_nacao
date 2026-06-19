@@ -337,11 +337,12 @@ def process_article(entry, posted):
 
     tweet_file = os.path.join(post_dir, "tweet.txt")
 
-    # Tweet já existe (gerado em run anterior) — não re-enfileira automaticamente;
-    # use x_publish_0_1.py localmente para posts perdidos
+    # Tweet já existe (gerado antes) mas NÃO está em `posted` (o check acima já
+    # filtrou os publicados): re-enfileira para não perder o post no fluxo
+    # gerar -> revisar -> publicar. Não regenera o texto — só mantém na fila.
     if os.path.exists(tweet_file):
-        print("  [Ignorado] Tweet já gerado em run anterior (não repostado automaticamente).")
-        return None
+        print("  [Re-enfileirado] Tweet já gerado, ainda não publicado.")
+        return dirname
 
     # Tweet ainda não existe — gera agora
     try:
