@@ -5,5 +5,12 @@
         "editoria": "base",
         "approved_at": "2026-06-18T15:33:25.438831",
         "cover": "static/covers/intertemporada-em-portugal-fla-testa-base-e-expoe-urgencia-por-reforcos.webp"
+    },
+    {
+        "file": "article_20260618_180433.json",
+        "slug": "cruzeiro-reforca-para-duelo-contra-o-flamengo",
+        "editoria": "selecao",
+        "approved_at": "2026-06-18T22:07:14.684400",
+        "cover": "static/covers/cruzeiro-reforca-para-duelo-contra-o-flamengo.webp"
     }
 ]
