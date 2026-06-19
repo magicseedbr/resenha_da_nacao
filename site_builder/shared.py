@@ -32,6 +32,7 @@ OUTPUT_DIR = os.path.join(SCRIPT_DIR, "output")
 EDITORIAS = {
     "mercado": "Mercado da Bola",
     "base": "Crias do Ninho",
+    "rivais": "Rivais",
     "selecao": "Seleção",
     "bastidores": "Bastidores",
     "geral": "Geral",
@@ -51,6 +52,15 @@ _EDITORIA_KEYWORDS = {
         "revelado pel", "formado na base", "formado nas categorias",
         "base rubro-negra",
     ],
+    # Matéria centrada em outro clube (rival). Nomes/apelidos distintivos dos
+    # rivais — captura notícias sobre o adversário (demissão, reforço, crise).
+    "rivais": [
+        "vasco", "vascaino", "cruzeiro", "cruzeirense",
+        "palmeiras", "palmeirense", "corinthians", "corintiano",
+        "botafogo", "fluminense", "tricolor das laranjeiras",
+        "sao paulo", "atletico-mg", "atletico mineiro", "galo",
+        "gremio", "internacional", "colorado", "athletico",
+    ],
     "selecao": ["selecao", "copa do mundo", "ancelotti", "convoca"],
     "mercado": [
         "contrat", "transfer", "reforco", "negocia", "proposta",
@@ -63,7 +73,7 @@ _EDITORIA_KEYWORDS = {
 }
 
 # Ordem de prioridade na hora de classificar (mais específicas primeiro).
-_EDITORIA_PRIORITY = ["base", "selecao", "mercado", "bastidores"]
+_EDITORIA_PRIORITY = ["base", "rivais", "selecao", "mercado", "bastidores"]
 
 
 def _strip_accents(text):

@@ -9,7 +9,7 @@
     {
         "file": "article_20260618_180433.json",
         "slug": "cruzeiro-reforca-para-duelo-contra-o-flamengo",
-        "editoria": "selecao",
+        "editoria": "rivais",
         "approved_at": "2026-06-18T22:07:14.684400",
         "cover": "static/covers/cruzeiro-reforca-para-duelo-contra-o-flamengo.webp"
     },
@@ -30,7 +30,7 @@
     {
         "file": "article_20260619_144314.json",
         "slug": "renato-gaucho-e-a-perda-do-elenco-o-contraste-entre-a-demissao-no-vasco-e-a-intertemporada-do-fla",
-        "editoria": "selecao",
+        "editoria": "rivais",
         "approved_at": "2026-06-19T14:43:14.842397",
         "cover": "static/covers/renato-gaucho-e-a-perda-do-elenco-o-contraste-entre-a-demissao-no-vasco-e-a-intertemporada-do-fla.webp"
     }
