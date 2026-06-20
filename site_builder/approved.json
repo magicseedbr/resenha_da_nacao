@@ -47,5 +47,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-20T11:48:33.100687",
         "cover": "static/covers/a-cria-que-chuta-a-desconfianca-vini-jr-assume-o-protagonismo-na-copa-do-mundo.webp"
+    },
+    {
+        "file": "article_20260620_115121.json",
+        "slug": "a-reviravolta-de-evertton-araujo-do-banco-a-vitrine-europeia-com-o-manto",
+        "editoria": "mercado",
+        "approved_at": "2026-06-20T11:53:47.219363",
+        "cover": "static/covers/a-reviravolta-de-evertton-araujo-do-banco-a-vitrine-europeia-com-o-manto.webp"
     }
 ]
