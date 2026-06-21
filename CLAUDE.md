@@ -109,6 +109,19 @@ python routine.py tudo --publish        # fluxo completo postando no X
 python routine.py site --no-deploy      # gera o site local, sem push no main
 ```
 
+### Rotina de engajamento (`routine_engajamento.py`)
+`routine_engajamento.py` (na raiz) é uma rotina **separada** da do artigo, focada em engajamento: **posta 1 vídeo e comenta em outros posts**. Duas fases: **video** (extrai os vídeos dos perfis-alvo com `x_video_post_extractor`, cura por relação com o Flamengo e reposta 1 vídeo com crédito via `x_video_reposter`) e **comentarios** (gera e publica comentários nos perfis-alvo, reusando o `x_commenter`). Mesma filosofia supervisionada: por padrão só gera/exibe; publica de fato só com `--publish`.
+
+```bash
+python routine_engajamento.py                     # tudo, sem postar (revisão)
+python routine_engajamento.py --publish           # posta 1 vídeo + comentários
+python routine_engajamento.py video --publish     # só o vídeo (1, curado)
+python routine_engajamento.py video --videos 2 --no-extract --publish
+python routine_engajamento.py comentarios --keep geglobo,Brasileirao --publish
+```
+
+Flags: `--videos N` (quantos vídeos repostar, padrão 1), `--no-extract` (reaproveita o que já está em `extracted/`), `--no-curate` (pula o filtro de relação com o Flamengo), `--keep h1,h2` (curadoria da fila de comentários).
+
 ## Lógica Principal
 
 ### Apenas notícias do dia corrente
