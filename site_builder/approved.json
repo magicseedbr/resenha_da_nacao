@@ -54,5 +54,12 @@
         "editoria": "mercado",
         "approved_at": "2026-06-20T11:53:47.219363",
         "cover": "static/covers/a-reviravolta-de-evertton-araujo-do-banco-a-vitrine-europeia-com-o-manto.webp"
+    },
+    {
+        "file": "article_20260620_211957.json",
+        "slug": "a-voz-da-gavea-e-o-dilema-da-camisa-amarela-boto-defende-pedro-e-questiona-escolhas-da-selecao",
+        "editoria": "rivais",
+        "approved_at": "2026-06-20T21:22:15.126119",
+        "cover": "static/covers/a-voz-da-gavea-e-o-dilema-da-camisa-amarela-boto-defende-pedro-e-questiona-escolhas-da-selecao.jpg"
     }
 ]
