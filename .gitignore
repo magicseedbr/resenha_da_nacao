@@ -19,3 +19,6 @@ site_builder/output/
 
 # Backup local do reset (checklist de remoção manual nas redes — não versionar)
 reset_backup/
+
+# Vídeos/posts extraídos do X (binários grandes, gerados localmente)
+x_video_post_extractor/extracted/

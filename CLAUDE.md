@@ -44,9 +44,15 @@ resenha_da_nacao/
 │   ├── templates/                      # Templates HTML (base, index, article, editoria, jornalista)
 │   ├── static/                         # CSS responsivo rubro-negro, logo.png da marca, escudo, capa-padrão e covers/
 │   └── output/                         # Site estático gerado (abrir output/index.html)
-└── instagram_creator/       # Etapa 6: Gera posts prontos para o Instagram
-    ├── instagram_post_creator_0_1.py   # Gera legenda (Gemini) + copia capa por artigo aprovado
-    └── instagram_posts/                # Saída: uma pasta por artigo com caption.txt e image.*
+├── instagram_creator/       # Etapa 6: Gera posts prontos para o Instagram
+│   ├── instagram_post_creator_0_1.py   # Gera legenda (Gemini) + copia capa por artigo aprovado
+│   └── instagram_posts/                # Saída: uma pasta por artigo com caption.txt e image.*
+└── x_video_post_extractor/  # Extrai e reposta vídeos dos perfis-alvo
+    ├── x_video_post_extractor_0_1.py   # Acha o post+recente com vídeo, baixa o vídeo, guarda texto e top comentário
+    ├── x_video_reposter_0_1.py         # Cura (relação c/ Flamengo) + gera texto novo + reposta o vídeo com crédito
+    ├── extracted/                      # Saída do extrator: uma pasta por perfil com video.mp4, post_data.json e repost_caption.txt (gitignored)
+    ├── processed_posts.json            # Histórico de URLs de posts já extraídos (dedup do extrator)
+    └── reposted_videos.json            # Histórico de URLs já repostadas (dedup do reposter)
 ```
 
 ## Pipeline de Execução
@@ -127,6 +133,35 @@ Os 3 artigos com maior Hype Score são enviados ao Gemini 2.5 Flash como candida
 
 ### Publicação (site_builder)
 Site estático, sem servidor nem banco. `approve.py` é um gate manual: lista os artigos de `generated_articles/` ainda não publicados, mostra prévia e registra os aprovados em `approved.json` (com slug e editoria derivada por palavras-chave do título/corpo). `build_site.py` lê `approved.json` e renderiza com Jinja2 a home (manchete + grade de cards estilo ge.globo), as páginas de artigo, as editorias (Mercado da Bola, Crias do Ninho, Seleção, Bastidores, Geral) e a página de cada jornalista (bio extraída da persona). Tema rubro-negro inspirado em flamengo.com.br, com a marca `static/logo.png` (PNG transparente) sobre o cabeçalho preto + barra de navegação, e layout responsivo (desktop, tablet e mobile via `clamp()` e media queries). A capa de cada artigo é a imagem real obtida por `image_searcher_og_0_1.py` (campo `cover` no `approved.json`); artigos sem capa caem em `static/capa_padrao.svg`.
+
+### Extração de posts com vídeo (x_video_post_extractor)
+`x_video_post_extractor/x_video_post_extractor_0_1.py` percorre os perfis de `x_commenter/profiles.txt` (reusa a lista do comentador) com Playwright + a sessão logada (`x_creator/x_session.json` localmente, ou o secret `X_SESSION_JSON` no CI) e, para cada perfil: acha o **post original mais recente com vídeo** (pula fixados/reposts), **baixa o vídeo**, guarda o **texto do post** e o **comentário mais curtido**. Saída em `extracted/<handle>/{video.mp4, post_data.json}`; dedup por post em `processed_posts.json` (não reextrai o mesmo post). A pasta `extracted/` é gitignored (vídeos grandes).
+
+Detalhes de implementação importantes:
+- **Download via HLS, não mp4 direto:** os `.mp4` "diretos" do `amplify_video` são apenas init segments DASH (~900 bytes, inúteis). O script captura as playlists `.m3u8` que o player solicita, escolhe a melhor variante de **vídeo** (`/avc1/<WxH>/`, maior resolução) + a melhor de **áudio** (`/mp4a/<bitrate>/`, maior bitrate) e o **ffmpeg** muxa as duas num `.mp4` com som (`brew install ffmpeg` é pré-requisito).
+- **Filtra o vídeo certo:** a página de status também carrega vídeos recomendados ("Descubra mais"), então a mídia é filtrada pelo id do **primeiro** vídeo capturado (o do post em foco) antes de escolher as faixas.
+- **Timeline virtualizada:** o X mantém no DOM só as células visíveis e as recicla ao rolar. Por isso a varredura de respostas rola em **passos pequenos** acumulando por URL e **para no divisor "Descubra mais"** — assim não pula o divisor (pegando recomendações como se fossem respostas) nem perde respostas. O nº de curtidas vem do `aria-label` do `[role="group"]` de cada resposta.
+
+### Schema de saída por post (x_video_post_extractor/extracted/<handle>/post_data.json)
+```json
+{
+  "handle": "ColunadoFla",
+  "post_url": "https://x.com/.../status/...",
+  "post_text": "...",
+  "video_file": "video.mp4",
+  "top_comment": { "text": "...", "author": "<handle sem @>", "likes": 4, "url": "..." },
+  "extracted_at": "ISO timestamp"
+}
+```
+
+### Repostagem de vídeos (x_video_reposter)
+`x_video_post_extractor/x_video_reposter_0_1.py` consome a saída do extrator (`extracted/<handle>/{video.mp4, post_data.json}`) e reposta os vídeos no @ResenhadaNacao. Para cada vídeo:
+- **Não reposta o mesmo vídeo duas vezes:** dedup por URL do post de origem em `reposted_videos.json`.
+- **Curadoria (relação com o Flamengo):** antes de gerar texto/publicar, uma chamada de LLM (`llm.generate`, batch — 1 chamada p/ todos) classifica cada vídeo como relacionado ou não, **julgando pelo CONTEÚDO** (não pela conta): o vídeo precisa falar do Flamengo/jogo/mercado ou de um jogador/técnico ATUAL do elenco (lido de `article_writer/elenco_flamengo.json`). Conta rubro-negra postando conteúdo genérico (workshop, promo) **não passa**. Os reprovados são descartados. `--no-curate` pula o filtro.
+- **Texto novo + crédito:** gera uma legenda original a partir do texto do post + comentário mais curtido (salva em `extracted/<handle>/repost_caption.txt`, editável) e **sempre** anexa a linha de crédito `🎥 via @handle` (garantida no código, dentro dos 280 chars).
+- **Publicação supervisionada:** por padrão só gera/exibe (dry-run). Posta de fato só com `--publish`, com **1 minuto de intervalo** entre posts. `--limit N` limita a quantidade.
+
+Detalhes de publicação do vídeo (Playwright): o sinal de "pronto pra postar" é o botão `[data-testid="tweetButton"]` **habilitar** (o vídeo processa após o preview aparecer; progressbars globais do X nunca somem, não servem). O preview do vídeo monta um **overlay que cobre todo o compositor**, interceptando cliques — por isso o foco usa `.focus()` (DOM, sem clique) e o envio é via atalho **Cmd/Ctrl+Enter**, com `click(force=True)` de fallback.
 
 ### Schema dos JSONs em raw_news/
 ```json
