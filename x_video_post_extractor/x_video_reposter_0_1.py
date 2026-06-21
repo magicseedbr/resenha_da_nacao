@@ -179,11 +179,14 @@ sorteio, propaganda, recado da página, outro time — NÃO conta como relação
 
 Para CADA post abaixo, decida se o CONTEÚDO tem relação com o Flamengo.
 - related=true: o conteúdo fala do Flamengo, de um jogo/treino/bastidor do
-  Flamengo, de contratação/negociação envolvendo o Flamengo, ou de um
-  jogador/técnico ATUAL do elenco (mesmo jogando pela seleção).
-- related=false: é sobre outro clube, outro jogador, tema genérico/promocional,
-  ou qualquer coisa sem o Flamengo no conteúdo (ex.: gol de rival, jogador de
-  outra equipe, seleção genérica, divulgação da própria página).
+  Flamengo, de contratação/negociação envolvendo o Flamengo, de um
+  jogador/técnico ATUAL do elenco (mesmo jogando pela seleção), OU de um
+  ÍDOLO/LENDA/ex-jogador histórico do Flamengo — ex.: Zico, Júnior, Adriano,
+  Petkovic, Bebeto, Gabigol — mesmo que não jogue mais no clube.
+- related=false: é sobre outro clube, outro jogador (sem passado relevante no
+  Flamengo), tema genérico/promocional, ou qualquer coisa sem o Flamengo no
+  conteúdo (ex.: gol de rival, jogador de outra equipe, seleção genérica,
+  divulgação da própria página).
   Na dúvida sem ligação clara no conteúdo, marque false.
 
 ELENCO/CONTEXTO ATUAL DO FLAMENGO (jogadores/técnico que contam como relação):
