@@ -68,5 +68,12 @@
         "editoria": "base",
         "approved_at": "2026-06-20T22:05:02.678784",
         "cover": "static/covers/paqueta-no-comando-brasil-3-a-0-no-haiti-e-ancelotti-ja-tem-o-as-na-manga.webp"
+    },
+    {
+        "file": "article_20260621_095200.json",
+        "slug": "plata-no-chao-equador-na-corda-bamba",
+        "editoria": "selecao",
+        "approved_at": "2026-06-21T09:52:11.272612",
+        "cover": "static/covers/plata-no-chao-equador-na-corda-bamba.webp"
     }
 ]
