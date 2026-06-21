@@ -61,5 +61,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-20T21:22:15.126119",
         "cover": "static/covers/a-voz-da-gavea-e-o-dilema-da-camisa-amarela-boto-defende-pedro-e-questiona-escolhas-da-selecao.jpg"
+    },
+    {
+        "file": "article_20260620_220030.json",
+        "slug": "paqueta-no-comando-brasil-3-a-0-no-haiti-e-ancelotti-ja-tem-o-as-na-manga",
+        "editoria": "base",
+        "approved_at": "2026-06-20T22:05:02.678784",
+        "cover": "static/covers/paqueta-no-comando-brasil-3-a-0-no-haiti-e-ancelotti-ja-tem-o-as-na-manga.webp"
     }
 ]
