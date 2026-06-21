@@ -91,8 +91,14 @@ def slugify(text):
 
 def derive_editoria(title, body=""):
     """Deriva o slug da editoria a partir de palavras-chave no título e corpo."""
-    haystack = _strip_accents(f"{title} {body}".lower())
+    title_hay = _strip_accents((title or "").lower())
+    full_hay = _strip_accents(f"{title} {body}".lower())
     for editoria in _EDITORIA_PRIORITY:
+        # "rivais" só conta por menção no TÍTULO: a matéria precisa ser sobre o
+        # rival. Casar no corpo gerava falso-positivo quando um rival aparecia de
+        # passagem (ex.: citar o artilheiro "do Athletico-PR" numa matéria que é
+        # sobre a Seleção/Flamengo).
+        haystack = title_hay if editoria == "rivais" else full_hay
         for term in _EDITORIA_KEYWORDS[editoria]:
             if term in haystack:
                 return editoria
