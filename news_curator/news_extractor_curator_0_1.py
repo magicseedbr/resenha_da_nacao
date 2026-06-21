@@ -1,12 +1,14 @@
 import os
+import sys
 import re
 import json
 import glob
 from datetime import datetime
-from google import genai
 
 # Dynamic Path Resolution based on the script's absolute location
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(SCRIPT_DIR, "..")))
+import llm
 
 
 def load_env_file(env_path):
@@ -27,12 +29,7 @@ RAW_TWEETS_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "../news_extractor/raw
 
 # The output manifest will be saved directly inside the news_curator folder
 OUTPUT_FILE = os.path.join(SCRIPT_DIR, "selected_story.json")
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
 USED_STORIES_FILE = os.path.join(SCRIPT_DIR, "used_stories.json")
-
-# API Key carregada do arquivo .env na raiz do projeto (um nível acima deste script)
-load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 # Portuguese stop-words list to filter out noise from titles
 PORTUGUESE_STOP_WORDS = {
@@ -96,17 +93,11 @@ def calculate_hype_score(news_item, tweets_pool):
             
     return score
 
-def select_best_story_via_gemini(top_stories):
+def select_best_story_via_llm(top_stories):
     """
-    Leverages Gemini LLM capabilities to resolve ties or select the best option
+    Leverages Claude LLM capabilities to resolve ties or select the best option
     from top candidates based on contextual journalistic impact and social hype.
     """
-    # Validation check for the API key loaded from the .env file
-    if not GEMINI_API_KEY:
-        raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY no arquivo .env da raiz do projeto.")
-
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
     # Formulate context payload for evaluation loop
     candidates_context = []
     for index, item in enumerate(top_stories):
@@ -135,19 +126,13 @@ def select_best_story_via_gemini(top_stories):
     """
     
     try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL_NAME,
-            contents=prompt,
-            config={"response_mime_type": "application/json"},
-        )
-        
-        decision_data = json.loads(response.text)
+        decision_data = json.loads(llm.generate(prompt))
         chosen_index = int(decision_data["selected_index"])
         justification = decision_data["justification"]
-        
+
         return top_stories[chosen_index], justification
-    except Exception as gemini_err:
-        print(f"[Falha na API] Erro crítico durante a execução do Gemini: {gemini_err}")
+    except Exception as llm_err:
+        print(f"[Falha na API] Erro crítico durante a execução do Claude: {llm_err}")
         # Secure execution state fallback logic: return the absolute top 1 item by default
         return top_stories[0], "Seleção baseada estritamente no ranking matemático do Hype Score (Fallback devido a falha na API)."
 
@@ -224,10 +209,10 @@ def main():
     
     # Isolate up to 3 candidate stories for cognitive processing loop
     top_candidates = scored_news[:3]
-    print(f"\nTop {len(top_candidates)} notícias isoladas. Enviando para validação cognitiva do Gemini...")
+    print(f"\nTop {len(top_candidates)} notícias isoladas. Enviando para validação cognitiva do Claude...")
 
     # Route logic to generative nodes
-    winner_story, justification = select_best_story_via_gemini(top_candidates)
+    winner_story, justification = select_best_story_via_llm(top_candidates)
     
     print("\n--- Resultado da Curadoria ---")
     print(f" Vencedora: {winner_story['title']}")

@@ -3,7 +3,7 @@
 Rotina Resenha da Nação — orquestra o fluxo diário em 4 fases.
 
   1. criar       — extrai notícias do dia (Coluna do Fla + Globo), coleta tweets,
-                   cura a melhor (Gemini) e gera o artigo original.
+                   cura a melhor (Claude) e gera o artigo original.
   2. site        — aprova (auto), busca a capa real, gera o site estático e faz
                    o deploy (commit + push no main -> GitHub Pages).
   3. xpost       — gera o post do X (thread hook + reply com link).
@@ -175,7 +175,7 @@ def fase_criar():
             return ""
 
     antes_cur = _curated_at()
-    run("Curadoria (Hype Score + Gemini)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
+    run("Curadoria (Hype Score + Claude)", ["news_extractor_curator_0_1.py"], cwd=NEWS_CURATOR)
     if _curated_at() == antes_cur:
         raise SystemExit("[Rotina] A curadoria não selecionou notícia nova (selected_story.json "
                          "inalterado — provável ausência de notícia inédita do dia). Interrompendo "

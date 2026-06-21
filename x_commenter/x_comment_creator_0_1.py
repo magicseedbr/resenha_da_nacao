@@ -20,6 +20,7 @@ Uso:
 """
 
 import os
+import sys
 import json
 import time
 import base64
@@ -27,12 +28,12 @@ import random
 import tempfile
 from datetime import datetime
 
-from google import genai
-from groq import Groq
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 from playwright_stealth import Stealth
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(SCRIPT_DIR, "..")))
+import llm
 
 PROFILES_FILE  = os.path.join(SCRIPT_DIR, "profiles.txt")
 COMMENTS_DIR   = os.path.join(SCRIPT_DIR, "comments")
@@ -40,9 +41,6 @@ PENDING_FILE   = os.path.join(SCRIPT_DIR, "pending_comments.json")
 PUBLISHED_FILE = os.path.join(SCRIPT_DIR, "published_comments.json")
 # Reusa a sessão já logada do processo de posts (uso local)
 SESSION_FILE   = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "x_creator", "x_session.json"))
-
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
-GROQ_MODEL_NAME   = "llama-3.3-70b-versatile"
 
 _MAX_COMMENT = 270  # margem dentro dos 280 do X
 _STEALTH = Stealth(navigator_user_agent=False)
@@ -66,8 +64,6 @@ def load_env_file(env_path):
 
 
 load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GROQ_API_KEY   = os.environ.get("GROQ_API_KEY")
 
 
 # ── Perfis ───────────────────────────────────────────────────────────────────
@@ -170,18 +166,32 @@ def get_latest_post(page, handle):
 
 # ── Geração do comentário ──────────────────────────────────────────────────────
 
-def _build_prompt(handle, post_text):
-    has_text = bool(post_text.strip())
-    post_block = post_text if has_text else "(o post não tem texto — é imagem/vídeo)"
+def _clean_comment(text):
+    """Achata espaços e corta no limite de caracteres do X."""
+    flat = " ".join((text or "").split()).strip()
+    return flat[:_MAX_COMMENT].rstrip()
+
+
+def _build_batch_prompt(targets):
+    """Monta UM prompt com todos os posts (1 chamada de LLM p/ todos os perfis).
+
+    targets: lista de {"handle", "post_text"}.
+    """
+    blocos = []
+    for t in targets:
+        post = t["post_text"].strip() or "(o post não tem texto — é imagem/vídeo)"
+        blocos.append(f'### @{t["handle"]}\n{post}')
+    posts_block = "\n\n".join(blocos)
 
     return f"""Você administra o @ResenhadaNacao, uma página de TORCIDA do Flamengo no X.
-Você vai comentar no post mais recente do perfil @{handle}.
+Abaixo estão os posts mais recentes de VÁRIOS perfis. Escreva UM comentário para
+CADA perfil, reagindo ao post daquele perfil.
 
-OBJETIVO: escrever um comentário que dialoga com o conteúdo do post e gera
+OBJETIVO de cada comentário: dialogar com o conteúdo REAL do post e gerar
 CURIOSIDADE sobre quem comentou, de um jeito que faça a pessoa querer CLICAR no
 seu perfil pra ver mais — SEM pedir isso explicitamente.
 
-COMO ESCREVER:
+COMO ESCREVER cada comentário:
 - Reaja ao conteúdo REAL do post (mostre que leu/entendeu), com uma opinião,
   um ângulo rubro-negro, uma provocação leve ou um "tem mais nessa história".
 - Deixe um gancho de curiosidade: a sensação de que você sabe/tem algo a mais —
@@ -194,63 +204,46 @@ PROIBIDO:
 - NÃO use hashtag.
 - NÃO invente fato sobre o post (não sabe? não afirma). Curiosidade não é mentira.
 - Nada de elogio vazio nem comentário que serviria pra qualquer post.
-- No máximo 1 emoji (zero é ótimo).
+- No máximo 1 emoji por comentário (zero é ótimo).
 
 FORMATO:
-- LIMITE: {_MAX_COMMENT} caracteres. Português informal, sotaque carioca leve.
+- LIMITE: {_MAX_COMMENT} caracteres por comentário. Português informal, sotaque carioca leve.
 - Responda SOMENTE com JSON válido, sem markdown.
 
---- POST DE @{handle} ---
-{post_block}
---- FIM DO POST ---
+--- POSTS ---
+{posts_block}
+--- FIM DOS POSTS ---
 
-JSON esperado:
+JSON esperado (um item por perfil, na mesma ordem; use o handle EXATO sem @):
 {{
-    "comment": "<comentário curto, curioso, sem link/@/hashtag, até {_MAX_COMMENT} chars>"
+    "comments": [
+        {{"handle": "<handle>", "comment": "<comentário curto, sem link/@/hashtag, até {_MAX_COMMENT} chars>"}}
+    ]
 }}
 """
 
 
-def _via_gemini(prompt):
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY não definida")
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    resp = client.models.generate_content(
-        model=GEMINI_MODEL_NAME, contents=prompt,
-        config={"response_mime_type": "application/json"},
-    )
-    return json.loads(resp.text).get("comment", "")
+def generate_comments_batch(targets):
+    """Gera todos os comentários em UMA chamada de LLM. Retorna {handle: comment}.
 
-
-def _via_groq(prompt):
-    if not GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY não definida")
-    client = Groq(api_key=GROQ_API_KEY)
-    resp = client.chat.completions.create(
-        model=GROQ_MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"},
-    )
-    return json.loads(resp.choices[0].message.content).get("comment", "")
-
-
-def generate_comment(handle, post_text):
-    prompt = _build_prompt(handle, post_text)
+    Em qualquer falha, retorna {} (todos os perfis são pulados — sem fallback)."""
+    if not targets:
+        return {}
     try:
-        text = _via_gemini(prompt)
-        print("    (via Gemini)")
+        data = json.loads(llm.generate(_build_batch_prompt(targets)))
+        items = data.get("comments", []) if isinstance(data, dict) else []
+        print(f"    (via Claude — 1 chamada p/ {len(targets)} perfis)")
     except Exception as err:
-        es = str(err)
-        tag = "[Gemini 429]" if ("429" in es or "quota" in es.lower()) else "[Gemini falhou]"
-        print(f"    {tag} {es[:90]} — tentando Groq...")
-        try:
-            text = _via_groq(prompt)
-            print("    (via Groq fallback)")
-        except Exception as err2:
-            print(f"    [Falha] Groq também falhou: {err2}")
-            return ""
-    text = " ".join(text.split()).strip()
-    return text[:_MAX_COMMENT].rstrip()
+        print(f"    [Claude falhou] {str(err)[:120]} — pulando todos (sem fallback).")
+        return {}
+
+    out = {}
+    for it in items:
+        handle = (it.get("handle") or "").lstrip("@").strip()
+        comment = _clean_comment(it.get("comment", ""))
+        if handle and comment:
+            out[handle] = comment
+    return out
 
 
 # ── Persistência ───────────────────────────────────────────────────────────────
@@ -325,8 +318,9 @@ def main():
     print(f" {len(profiles)} perfil(is): {', '.join('@'+p for p in profiles)}\n")
     os.makedirs(COMMENTS_DIR, exist_ok=True)
     already = commented_post_urls()
-    pending = []
 
+    # Passo 1 — raspa o post mais recente de cada perfil (Playwright).
+    targets = []  # [{handle, post}]
     with sync_playwright() as pw:
         browser = make_browser(pw)
         context = make_context(browser, session_path)
@@ -352,18 +346,28 @@ def main():
                 continue
 
             print(f"    Post: {_short(post['text']) or '(sem texto)'}")
-            comment = generate_comment(handle, post["text"])
-            if not comment:
-                print("    [Erro] Não gerei comentário. Pulando.")
-                continue
-
-            save_comment(handle, post, comment)
-            pending.append(handle)
-            print(f"    Comentário: {comment}")
-            print(f"    [OK] salvo em comments/{handle}/  ({len(comment)}/280)\n")
-            _human_delay(2.0, 4.0)
+            targets.append({"handle": handle, "post": post})
+            _human_delay(1.0, 2.0)
 
         context.close(); browser.close()
+
+    # Passo 2 — gera TODOS os comentários em UMA chamada de LLM (economia de quota).
+    print(f"\n--- Gerando {len(targets)} comentário(s) em 1 chamada ---")
+    comments = generate_comments_batch(
+        [{"handle": t["handle"], "post_text": t["post"]["text"]} for t in targets]
+    )
+
+    # Passo 3 — salva cada comentário gerado.
+    pending = []
+    for t in targets:
+        handle = t["handle"]
+        comment = comments.get(handle)
+        if not comment:
+            print(f"    [Pulado] @{handle}: sem comentário gerado.")
+            continue
+        save_comment(handle, t["post"], comment)
+        pending.append(handle)
+        print(f"    @{handle}: {comment}  ({len(comment)}/280)")
 
     save_pending(pending)
     print("-" * 70)

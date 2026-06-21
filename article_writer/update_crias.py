@@ -4,7 +4,7 @@ elenco_flamengo.json.
 
 "Cria do Ninho" é o jogador FORMADO nas categorias de base do Flamengo — não
 qualquer jogador que treina no Ninho do Urubu (o CT é usado por todo o elenco).
-Este script pergunta ao Gemini quais jogadores do elenco subiram da base e grava
+Este script pergunta ao Claude quais jogadores do elenco subiram da base e grava
 o resultado no campo `crias_da_base`.
 
 Para não gastar API a cada rodada do pipeline, guarda um hash do conjunto de
@@ -13,32 +13,17 @@ sai sem chamar a API. Em caso de falha na API, mantém a lista existente.
 """
 
 import os
+import sys
 import re
 import json
 import hashlib
 from datetime import datetime
-from google import genai
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(SCRIPT_DIR, "..")))
+import llm
+
 ELENCO_FILE = os.path.join(SCRIPT_DIR, "elenco_flamengo.json")
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
-
-
-def load_env_file(env_path):
-    """Lê um arquivo .env simples (KEY=VALUE) e popula os.environ, sem dependências externas."""
-    if not os.path.exists(env_path):
-        return
-    with open(env_path, "r", encoding="utf-8") as env_file:
-        for line in env_file:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, value = line.partition("=")
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-
-
-load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 
 def player_name(entry):
@@ -65,12 +50,7 @@ def load_elenco():
 
 
 def detect_crias(names):
-    """Pergunta ao Gemini quais nomes são crias da base do Flamengo. Retorna lista (ou None em falha)."""
-    if not GEMINI_API_KEY:
-        raise ValueError("[Falha de Autenticação] Defina GEMINI_API_KEY no arquivo .env da raiz do projeto.")
-
-    client = genai.Client(api_key=GEMINI_API_KEY)
-
+    """Pergunta ao Claude quais nomes são crias da base do Flamengo. Retorna lista (ou None em falha)."""
     jogadores_str = "\n".join(f"- {n}" for n in names)
     prompt = f"""Você é um especialista na história do Clube de Regatas do Flamengo.
 
@@ -94,18 +74,13 @@ Responda SOMENTE com JSON válido, sem markdown:
 }}
 """
     try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL_NAME,
-            contents=prompt,
-            config={"response_mime_type": "application/json"},
-        )
-        data = json.loads(response.text)
+        data = json.loads(llm.generate(prompt))
         crias = data.get("crias_da_base", [])
         # Mantém apenas nomes que realmente estão no elenco enviado (defesa contra alucinação).
         valid = {n.lower(): n for n in names}
         return [valid[c.lower()] for c in crias if c.lower() in valid]
     except Exception as err:
-        print(f"[Falha na API] Erro durante detecção de crias com Gemini: {err}")
+        print(f"[Falha na API] Erro durante detecção de crias com Claude: {err}")
         return None
 
 
@@ -126,7 +101,7 @@ def main():
         print(f" Crias atuais: {elenco.get('crias_da_base', [])}")
         return
 
-    print(f" Elenco mudou (ou primeira execução). Consultando Gemini para {len(names)} jogadores...")
+    print(f" Elenco mudou (ou primeira execução). Consultando Claude para {len(names)} jogadores...")
     crias = detect_crias(names)
     if crias is None:
         print("[Mantido] Falha na API — lista de crias existente preservada.")

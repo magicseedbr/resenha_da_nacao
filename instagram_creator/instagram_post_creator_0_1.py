@@ -1,13 +1,14 @@
 import os
+import sys
 import json
 import shutil
 import subprocess
 from datetime import datetime
-from google import genai
-from groq import Groq
 from PIL import Image, ImageDraw, ImageFont
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(SCRIPT_DIR, "..")))
+import llm
 
 
 def load_env_file(env_path):
@@ -65,12 +66,6 @@ COVERS_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "../site_builder/static/co
 PERSONAS_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "../article_writer/personas"))
 OUTPUT_DIR = os.path.join(SCRIPT_DIR, "instagram_posts")
 PUBLISHED_FILE = os.path.join(OUTPUT_DIR, "published_posts.json")
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
-GROQ_MODEL_NAME = "llama-3.3-70b-versatile"
-
-load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 HASHTAGS_BASE = "#Flamengo #Mengao #VaiFlamengo #CRF #NacaoRubroNegra #ResenhadaNacao"
 
@@ -299,50 +294,15 @@ Responda com este JSON exato:
 """
 
 
-def _generate_via_gemini(prompt):
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY não definida")
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model=GEMINI_MODEL_NAME,
-        contents=prompt,
-        config={"response_mime_type": "application/json"},
-    )
-    return json.loads(response.text).get("caption", "")
-
-
-def _generate_via_groq(prompt):
-    if not GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY não definida")
-    client = Groq(api_key=GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model=GROQ_MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"},
-    )
-    return json.loads(response.choices[0].message.content).get("caption", "")
-
-
 def generate_caption(article_data, persona_content, editoria):
     prompt = _build_prompt(article_data, persona_content, editoria)
 
     try:
-        caption = _generate_via_gemini(prompt)
-        print(f"  (via Gemini)")
+        caption = json.loads(llm.generate(prompt)).get("caption", "")
+        print(f"  (via Claude)")
         return caption
     except Exception as err:
-        err_str = str(err)
-        if "429" in err_str or "quota" in err_str.lower():
-            print(f"  [Gemini 429] Quota esgotada — tentando Groq...")
-        else:
-            print(f"  [Gemini falhou] {err_str[:120]} — tentando Groq...")
-
-    try:
-        caption = _generate_via_groq(prompt)
-        print(f"  (via Groq fallback)")
-        return caption
-    except Exception as err:
-        print(f"  [Falha na API] Groq também falhou: {err}")
+        print(f"  [Claude falhou] {str(err)[:120]} — sem fallback.")
         return ""
 
 

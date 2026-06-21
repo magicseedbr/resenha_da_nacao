@@ -10,10 +10,6 @@ urllib3>=2.0.0
 
 tweepy>=4.14.0
 
-google-generativeai>=0.3.0
-
-google-genai>=0.1.1
-
 ddgs>=0.1.0
 
 # Site builder (geração do site estático)
@@ -22,5 +18,5 @@ jinja2>=3.1.0
 # Image processing (conversão webp→png para Instagram)
 Pillow>=10.0.0
 
-# Fallback LLM (Groq: Llama 3.3 70B, 1000 req/dia grátis)
-groq>=0.9.0
+# LLM: geração via CLI `claude -p` (Claude Code) — ver llm.py. Sem dependência
+# Python de LLM (nem google-genai nem groq); a chamada é por subprocess.

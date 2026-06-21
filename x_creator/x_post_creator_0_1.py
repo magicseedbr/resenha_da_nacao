@@ -16,15 +16,16 @@ Histórico: x_posts/published_x_posted.json
 """
 
 import os
+import sys
 import json
 import shutil
 import hashlib
 import subprocess
 from datetime import datetime
-from google import genai
-from groq import Groq
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(SCRIPT_DIR, "..")))
+import llm
 
 # ── Constantes ────────────────────────────────────────────────────────────────
 OUTPUT_DIR      = os.path.join(SCRIPT_DIR, "x_posts")
@@ -32,9 +33,6 @@ PUBLISHED_FILE  = os.path.join(OUTPUT_DIR, "published_x_posted.json")  # fonte d
 TO_POST_FILE    = os.path.join(OUTPUT_DIR, "to_post.json")
 PERSONAS_DIR   = os.path.abspath(os.path.join(SCRIPT_DIR, "../article_writer/personas"))
 COVERS_DIR     = os.path.abspath(os.path.join(SCRIPT_DIR, "../site_builder/static/covers"))
-
-GEMINI_MODEL_NAME = "gemini-2.5-flash"
-GROQ_MODEL_NAME   = "llama-3.3-70b-versatile"
 
 _MAX_TWEET = 280
 # Margem de segurança para o hook (o modelo às vezes estoura a contagem)
@@ -83,8 +81,6 @@ def load_env_file(env_path):
 
 
 load_env_file(os.path.join(SCRIPT_DIR, "..", ".env"))
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-GROQ_API_KEY   = os.environ.get("GROQ_API_KEY")
 SITE_BASE_URL  = os.environ.get("SITE_BASE_URL", "").rstrip("/")
 
 
@@ -239,53 +235,16 @@ JSON esperado:
 """
 
 
-def _generate_via_gemini(prompt):
-    if not GEMINI_API_KEY:
-        raise ValueError("GEMINI_API_KEY não definida")
-    client = genai.Client(api_key=GEMINI_API_KEY)
-    response = client.models.generate_content(
-        model=GEMINI_MODEL_NAME,
-        contents=prompt,
-        config={"response_mime_type": "application/json"},
-    )
-    data = json.loads(response.text)
-    return data.get("tweet", ""), data.get("reply_teaser", "")
-
-
-def _generate_via_groq(prompt):
-    if not GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY não definida")
-    client = Groq(api_key=GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model=GROQ_MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}],
-        response_format={"type": "json_object"},
-    )
-    data = json.loads(response.choices[0].message.content)
-    return data.get("tweet", ""), data.get("reply_teaser", "")
-
-
 def generate_tweet_text(article_data, persona_content, slug):
     """Retorna (hook, reply_teaser). reply_teaser pode vir vazio (usa fallback)."""
     prompt = _build_prompt(article_data, persona_content, pick_closer(slug))
 
     try:
-        hook, teaser = _generate_via_gemini(prompt)
-        print("  (via Gemini)")
-        return hook, teaser
+        data = json.loads(llm.generate(prompt))
+        print("  (via Claude)")
+        return data.get("tweet", ""), data.get("reply_teaser", "")
     except Exception as err:
-        err_str = str(err)
-        if "429" in err_str or "quota" in err_str.lower():
-            print("  [Gemini 429] Quota esgotada — tentando Groq...")
-        else:
-            print(f"  [Gemini falhou] {err_str[:120]} — tentando Groq...")
-
-    try:
-        hook, teaser = _generate_via_groq(prompt)
-        print("  (via Groq fallback)")
-        return hook, teaser
-    except Exception as err:
-        print(f"  [Falha na API] Groq também falhou: {err}")
+        print(f"  [Claude falhou] {str(err)[:120]} — sem fallback.")
         return "", ""
 
 
