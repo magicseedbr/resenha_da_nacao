@@ -10,8 +10,13 @@ Revisão: o conteúdo já foi conferido na etapa de geração. Para postar só u
 subconjunto, edite pending_comments.json (remova os handles indesejados) antes
 de rodar.
 
+Ritmo: por padrão posta no máximo 3 comentários por execução, com 30s de
+intervalo entre um e outro (config. via --limit e --interval). O que sobra fica
+na fila pending_comments.json pra próxima execução.
+
 Uso:
     python x_comment_publisher_0_1.py
+    python x_comment_publisher_0_1.py --limit 3 --interval 30
 """
 
 import os
@@ -19,6 +24,7 @@ import json
 import time
 import base64
 import random
+import argparse
 import tempfile
 from datetime import datetime
 
@@ -33,6 +39,10 @@ PUBLISHED_FILE   = os.path.join(SCRIPT_DIR, "published_comments.json")
 SESSION_FILE     = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "x_creator", "x_session.json"))
 
 _STEALTH = Stealth(navigator_user_agent=False)
+
+# Ritmo padrão: no máximo 3 comentários por execução, 30s entre cada.
+_DEFAULT_LIMIT    = 3
+_DEFAULT_INTERVAL = 30.0
 
 
 # ── Fila / log ──────────────────────────────────────────────────────────────────
@@ -161,6 +171,13 @@ def post_reply(page, post_url, comment_text):
 # ── Main ────────────────────────────────────────────────────────────────────────
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--limit", type=int, default=_DEFAULT_LIMIT,
+                    help=f"máximo de comentários por execução (padrão {_DEFAULT_LIMIT})")
+    ap.add_argument("--interval", type=float, default=_DEFAULT_INTERVAL,
+                    help=f"segundos entre comentários (padrão {_DEFAULT_INTERVAL:.0f})")
+    args = ap.parse_args()
+
     print("=" * 70)
     print(" RESENHA DA NAÇÃO — Comentador (publicação)")
     print("=" * 70)
@@ -181,7 +198,8 @@ def main():
     done_urls = {v["post_url"] for v in published.values()
                  if isinstance(v, dict) and v.get("post_url")} | \
                 {k for k in published if "/status/" in k}
-    print(f" {len(pending)} comentário(s) na fila: {pending}\n")
+    print(f" {len(pending)} comentário(s) na fila: {pending}")
+    print(f" Limite desta execução: {args.limit} | intervalo: {args.interval:.0f}s\n")
 
     posted = 0
     still_pending = []
@@ -197,6 +215,11 @@ def main():
             return
 
         for handle in pending:
+            # Atingiu o limite desta execução: o resto fica na fila p/ a próxima.
+            if posted >= args.limit:
+                still_pending.append(handle)
+                continue
+
             data = load_post_data(handle)
             if not data or not data.get("post_url") or not data.get("comment"):
                 print(f"-> @{handle}: dados ausentes em comments/{handle}/. Pulando.")
@@ -206,6 +229,12 @@ def main():
             if data["post_url"] in done_urls:
                 print(f"-> @{handle}: esse post já foi comentado antes. Pulando.")
                 continue
+
+            # Intervalo ANTES de cada post (menos o primeiro): espaça os
+            # comentários sem deixar uma espera "à toa" no fim da execução.
+            if posted > 0:
+                print(f"   Aguardando {args.interval:.0f}s até o próximo...\n")
+                time.sleep(args.interval)
 
             print(f"-> @{handle}")
             print(f"   Post : {data['post_url']}")
@@ -228,7 +257,6 @@ def main():
                 done_urls.add(data["post_url"])
                 posted += 1
                 print("   [OK] Comentado!\n")
-                _human_delay(8.0, 16.0)   # ritmo conservador entre comentários
             else:
                 print("   [Erro] Pode não ter postado. Verifique o X.\n")
                 still_pending.append(handle)
@@ -237,9 +265,9 @@ def main():
 
     save_json(PENDING_FILE, still_pending)
     print("-" * 70)
-    print(f" Concluído. {posted}/{len(pending)} comentário(s) postado(s).")
+    print(f" Concluído. {posted} comentário(s) postado(s) nesta execução.")
     if still_pending:
-        print(f" Restaram na fila (revisar): {still_pending}")
+        print(f" Restaram na fila p/ a próxima: {still_pending}")
     print("=" * 70)
 
 
