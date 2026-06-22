@@ -22,3 +22,6 @@ reset_backup/
 
 # Vídeos/posts extraídos do X (binários grandes, gerados localmente)
 x_video_post_extractor/extracted/
+
+# Claude Code local settings (contém secret/paths locais — não versionar)
+.claude/settings.json

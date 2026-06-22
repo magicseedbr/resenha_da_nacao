@@ -75,5 +75,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-21T09:52:11.272612",
         "cover": "static/covers/plata-no-chao-equador-na-corda-bamba.webp"
+    },
+    {
+        "file": "article_20260622_193225.json",
+        "slug": "vini-jr-eleva-renato-abreu-a-heroi-ele-nos-salvou-do-rebaixamento-umas-oito-vezes",
+        "editoria": "selecao",
+        "approved_at": "2026-06-22T19:32:25.519241",
+        "cover": "static/covers/vini-jr-eleva-renato-abreu-a-heroi-ele-nos-salvou-do-rebaixamento-umas-oito-vezes.webp"
     }
 ]
