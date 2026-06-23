@@ -82,5 +82,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-22T19:32:25.519241",
         "cover": "static/covers/vini-jr-eleva-renato-abreu-a-heroi-ele-nos-salvou-do-rebaixamento-umas-oito-vezes.webp"
+    },
+    {
+        "file": "article_20260623_081752.json",
+        "slug": "portugal-precisa-de-resposta-inglaterra-pode-fechar-a-conta-e-a-copa-acelera-nesta-terca",
+        "editoria": "selecao",
+        "approved_at": "2026-06-23T08:17:52.191351",
+        "cover": "static/covers/portugal-precisa-de-resposta-inglaterra-pode-fechar-a-conta-e-a-copa-acelera-nesta-terca.webp"
     }
 ]
