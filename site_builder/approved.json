@@ -89,5 +89,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-23T08:17:52.191351",
         "cover": "static/covers/portugal-precisa-de-resposta-inglaterra-pode-fechar-a-conta-e-a-copa-acelera-nesta-terca.webp"
+    },
+    {
+        "file": "article_20260624_134704.json",
+        "slug": "o-lateral-que-saiu-do-liverpool-de-graca-e-tem-uma-conta-aberta-com-o-mengao",
+        "editoria": "selecao",
+        "approved_at": "2026-06-24T13:47:35.248850",
+        "cover": "static/covers/o-lateral-que-saiu-do-liverpool-de-graca-e-tem-uma-conta-aberta-com-o-mengao.webp"
     }
 ]
