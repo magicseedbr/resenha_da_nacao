@@ -103,5 +103,12 @@
         "editoria": "base",
         "approved_at": "2026-06-24T23:07:24.379758",
         "cover": "static/covers/dois-de-vini-metodo-de-sobra-o-brasil-que-passou-pela-escocia-tinha-logica-no-placar.webp"
+    },
+    {
+        "file": "article_20260624_234052.json",
+        "slug": "ronaldo-em-seis-copas-e-portugal-de-volta-ao-eixo-o-que-mudou-no-jogo-depois-do-tropeco-com-o-congo",
+        "editoria": "selecao",
+        "approved_at": "2026-06-24T23:43:38.545271",
+        "cover": "static/covers/ronaldo-em-seis-copas-e-portugal-de-volta-ao-eixo-o-que-mudou-no-jogo-depois-do-tropeco-com-o-congo.webp"
     }
 ]
