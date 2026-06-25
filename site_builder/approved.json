@@ -96,5 +96,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-24T13:47:35.248850",
         "cover": "static/covers/o-lateral-que-saiu-do-liverpool-de-graca-e-tem-uma-conta-aberta-com-o-mengao.webp"
+    },
+    {
+        "file": "article_20260624_230724.json",
+        "slug": "dois-de-vini-metodo-de-sobra-o-brasil-que-passou-pela-escocia-tinha-logica-no-placar",
+        "editoria": "base",
+        "approved_at": "2026-06-24T23:07:24.379758",
+        "cover": "static/covers/dois-de-vini-metodo-de-sobra-o-brasil-que-passou-pela-escocia-tinha-logica-no-placar.webp"
     }
 ]
