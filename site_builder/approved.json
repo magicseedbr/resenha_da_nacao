@@ -117,5 +117,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-25T23:57:17.392803",
         "cover": "static/covers/fifa-quer-mundial-de-48-clubes-em-2029-e-o-flamengo-ja-tem-cadeira-garantida-no-baile.jpg"
+    },
+    {
+        "file": "article_20260626_092831.json",
+        "slug": "o-sufoco-que-ficou-pedro-neto-menciona-o-flamengo-antes-de-decisao-de-portugal-na-copa",
+        "editoria": "selecao",
+        "approved_at": "2026-06-26T09:29:25.978193",
+        "cover": "static/covers/o-sufoco-que-ficou-pedro-neto-menciona-o-flamengo-antes-de-decisao-de-portugal-na-copa.webp"
     }
 ]
