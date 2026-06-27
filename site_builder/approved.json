@@ -124,5 +124,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-26T09:29:25.978193",
         "cover": "static/covers/o-sufoco-que-ficou-pedro-neto-menciona-o-flamengo-antes-de-decisao-de-portugal-na-copa.webp"
+    },
+    {
+        "file": "article_20260626_224717.json",
+        "slug": "cbf-abre-janela-antecipada-e-flamengo-ganha-prazo-extra-para-inscrever-reforcos-no-brasileirao",
+        "editoria": "selecao",
+        "approved_at": "2026-06-26T22:47:17.259731",
+        "cover": "static/covers/cbf-abre-janela-antecipada-e-flamengo-ganha-prazo-extra-para-inscrever-reforcos-no-brasileirao.webp"
     }
 ]
