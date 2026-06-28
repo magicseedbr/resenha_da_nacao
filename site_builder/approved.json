@@ -131,5 +131,12 @@
         "editoria": "selecao",
         "approved_at": "2026-06-26T22:47:17.259731",
         "cover": "static/covers/cbf-abre-janela-antecipada-e-flamengo-ganha-prazo-extra-para-inscrever-reforcos-no-brasileirao.webp"
+    },
+    {
+        "file": "article_20260628_013153.json",
+        "slug": "tres-copas-tres-gols-o-flamengo-nao-para-de-marcar-presenca-no-mundial",
+        "editoria": "base",
+        "approved_at": "2026-06-28T01:32:14.766642",
+        "cover": "static/covers/tres-copas-tres-gols-o-flamengo-nao-para-de-marcar-presenca-no-mundial.webp"
     }
 ]
